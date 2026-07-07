@@ -15,6 +15,8 @@ export default function BlogPost() {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
+  const [prev, setPrev] = useState(null);
+  const [next, setNext] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -58,6 +60,8 @@ export default function BlogPost() {
       const data = await res.json();
       setPost(data.post);
       setRelated(data.related || []);
+      setPrev(data.prev);
+      setNext(data.next);
 
       // Increment views (fire and forget)
       fetch(`/api/blog/increment-views?slug=${slug}`, { method: 'POST' })
@@ -215,6 +219,31 @@ export default function BlogPost() {
         <div className="container-page" style={{ maxWidth: 760, paddingBlock: 'clamp(16px, 3vw, 32px)' }}>
           <ContentRenderer html={post.body} />
         </div>
+
+        {/* Article Navigation */}
+        {(prev || next) && (
+          <div className="container-page" style={{ maxWidth: 760, marginTop: 40, paddingTop: 40, borderTop: '1px solid #F1F5F9' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24 }}>
+              {prev ? (
+                <Link to={`/blog/${prev.slug}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' }}>Previous</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <ArrowLeft size={16} style={{ color: '#5B3FD4' }} /> {prev.title}
+                  </span>
+                </Link>
+              ) : <div />}
+
+              {next ? (
+                <Link to={`/blog/${next.slug}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', textAlign: 'right' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' }}>Next</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {next.title} <ArrowRight size={16} style={{ color: '#5B3FD4' }} />
+                  </span>
+                </Link>
+              ) : <div />}
+            </div>
+          </div>
+        )}
 
         <div className="container-page" style={{ maxWidth: 760, marginTop: 40 }}>
           <div
