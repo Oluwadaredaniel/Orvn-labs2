@@ -294,28 +294,52 @@ export default function BlogEditor() {
               />
             </div>
 
-            <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
-                Category *
-              </label>
-              <select
-                value={post.category}
-                onChange={(e) => setPost({ ...post, category: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #E5E8F0',
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontFamily: "'Inter', sans-serif",
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Category *
+                </label>
+                <select
+                  value={post.category}
+                  onChange={(e) => setPost({ ...post, category: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontFamily: "'Inter', sans-serif",
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={post.tags?.join(', ') || ''}
+                  onChange={(e) => setPost({ ...post, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                  placeholder="e.g. tutorial, news"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontFamily: "'Inter', sans-serif",
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
             </div>
           </div>
 
