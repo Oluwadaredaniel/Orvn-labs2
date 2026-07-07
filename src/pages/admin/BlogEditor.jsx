@@ -515,6 +515,47 @@ export default function BlogEditor() {
             </div>
           </div>
 
+          {/* Article Settings */}
+          <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 16 }}>
+              Article Settings
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px', background: '#F8FAFC', borderRadius: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={post.settings?.enable_comments}
+                  onChange={(e) => setPost({ ...post, settings: { ...post.settings, enable_comments: e.target.checked } })}
+                />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Enable Comments</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px', background: '#F8FAFC', borderRadius: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={post.settings?.enable_likes}
+                  onChange={(e) => setPost({ ...post, settings: { ...post.settings, enable_likes: e.target.checked } })}
+                />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Enable Likes</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px', background: '#F8FAFC', borderRadius: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={post.settings?.show_author}
+                  onChange={(e) => setPost({ ...post, settings: { ...post.settings, show_author: e.target.checked } })}
+                />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Show Author Info</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px', background: '#F8FAFC', borderRadius: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={post.settings?.is_featured}
+                  onChange={(e) => setPost({ ...post, settings: { ...post.settings, is_featured: e.target.checked } })}
+                />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Featured Article</span>
+              </label>
+            </div>
+          </div>
+
           {/* Publish Toggle */}
           <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
