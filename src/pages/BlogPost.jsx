@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Copy, Check } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -18,6 +18,13 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     loadPost();
@@ -145,7 +152,7 @@ export default function BlogPost() {
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
               {post.tags.map((tag) => (
                 <span
                   key={tag}
@@ -163,6 +170,30 @@ export default function BlogPost() {
               ))}
             </div>
           )}
+
+          {/* Share Section */}
+          <div style={{ paddingBottom: 32, borderBottom: '1px solid #F1F5F9', marginBottom: 32 }}>
+            <button
+              onClick={handleCopyLink}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: copied ? '#F0FDF4' : '#fff',
+                border: `1.5px solid ${copied ? '#22C55E' : '#E5E8F0'}`,
+                padding: '8px 16px',
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 600,
+                color: copied ? '#16A34A' : '#475569',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              {copied ? <Check size={16} /> : <Share2 size={16} />}
+              {copied ? 'Link Copied!' : 'Share Article'}
+            </button>
+          </div>
         </div>
 
         <div className="container-page" style={{ maxWidth: 760, paddingBlock: 'clamp(16px, 3vw, 32px)' }}>
