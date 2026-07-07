@@ -17,10 +17,23 @@ export default function BlogPost() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
 
   useEffect(() => {
     loadPost();
   }, [slug]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const element = document.documentElement;
+      const scrollTotal = element.scrollHeight - element.clientHeight;
+      const scrollPos = element.scrollTop;
+      setReadingProgress((scrollPos / scrollTotal) * 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const loadPost = async () => {
     try {
@@ -73,7 +86,33 @@ export default function BlogPost() {
 
   return (
     <PageWrapper>
-      <article style={{ padding: 'clamp(48px, 6vw, 80px) 0 clamp(24px, 3vw, 40px)', background: '#fff' }}>
+      {/* Progress Bar */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: `${readingProgress}%`,
+          height: '4px',
+          background: '#5B3FD4',
+          zIndex: 1001,
+          transition: 'width 0.1s ease-out',
+        }}
+      />
+
+      <article style={{ padding: '0 0 clamp(24px, 3vw, 40px)', background: '#fff' }}>
+        {/* Hero Section */}
+        {post.featured_image_url && (
+          <div style={{ width: '100%', height: 'clamp(300px, 50vh, 500px)', overflow: 'hidden', position: 'relative', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+            <img
+              src={post.featured_image_url}
+              alt={post.featured_image_alt || post.title}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.6), transparent)' }} />
+          </div>
+        )}
+
         <div className="container-page" style={{ maxWidth: 760 }}>
           <Link
             to="/blog"
