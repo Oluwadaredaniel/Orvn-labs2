@@ -255,61 +255,80 @@ export default function Blog() {
                   {...fadeUp(idx * 0.05)}
                   className="card"
                   style={{
-                    padding: 'clamp(20px, 4vw, 32px)',
+                    padding: 0,
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
+                    overflow: 'hidden',
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 10,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: '#5B3FD4',
-                      marginBottom: 12,
-                      display: 'inline-block',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {post.category}
-                  </span>
-                  <Link
-                    to={`/blog/${post.slug}`}
-                    style={{
-                      fontSize: 'clamp(18px, 2.2vw, 24px)',
-                      fontWeight: 700,
-                      color: '#0F172A',
-                      margin: '0 0 12px',
-                      lineHeight: 1.35,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {post.title}
-                  </Link>
-                  <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.65, margin: '0 0 18px', flex: 1 }}>
-                    {post.excerpt}
-                  </p>
-                  <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>
-                    <span>{fmt(post.published_at)}</span>
-                    <span>·</span>
-                    <span>{post.read_minutes} min read</span>
+                  {post.featured_image_url && (
+                    <Link to={`/blog/${post.slug}`} style={{ display: 'block', overflow: 'hidden', height: 200 }}>
+                      <img
+                        src={post.featured_image_url}
+                        alt={post.featured_image_alt || post.title}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.5s ease',
+                        }}
+                        onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+                        onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+                      />
+                    </Link>
+                  )}
+                  <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <span
+                      style={{
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 10,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: '#5B3FD4',
+                        marginBottom: 12,
+                        display: 'inline-block',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {post.category}
+                    </span>
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      style={{
+                        fontSize: 'clamp(18px, 2.2vw, 22px)',
+                        fontWeight: 700,
+                        color: '#0F172A',
+                        margin: '0 0 12px',
+                        lineHeight: 1.35,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {post.title}
+                    </Link>
+                    <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.6, margin: '0 0 18px', flex: 1 }}>
+                      {post.excerpt}
+                    </p>
+                    <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>
+                      <span>{fmt(post.published_at)}</span>
+                      <span>·</span>
+                      <span>{post.read_minutes} min read</span>
+                    </div>
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        color: '#5B3FD4',
+                        fontWeight: 700,
+                        fontSize: 14,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Read post →
+                    </Link>
                   </div>
-                  <Link
-                    to={`/blog/${post.slug}`}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      color: '#5B3FD4',
-                      fontWeight: 700,
-                      fontSize: 14,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Read post →
-                  </Link>
                 </motion.article>
               ))}
             </div>
