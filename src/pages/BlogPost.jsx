@@ -152,6 +152,18 @@ export default function BlogPost() {
           <h1 className="h-display" style={{ fontSize: 'clamp(34px, 5vw, 56px)', margin: '0 0 18px' }}>
             {post.title}
           </h1>
+
+          {/* Author Info */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#EEEAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#5B3FD4', fontSize: 14 }}>
+              {post.author?.[0] || 'O'}
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{post.author || 'ORVN Labs'}</div>
+              <div style={{ fontSize: 12, color: '#94A3B8' }}>{post.category} · {fmt(post.published_at)}</div>
+            </div>
+          </div>
+
           <p className="lead" style={{ marginBottom: 24 }}>{post.excerpt}</p>
 
           {/* Tags */}
