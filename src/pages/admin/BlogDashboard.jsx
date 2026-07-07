@@ -249,7 +249,7 @@ export default function BlogDashboard() {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
+                gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto',
                 gap: 16,
                 padding: '16px 20px',
                 background: '#F7F8FB',
@@ -261,10 +261,11 @@ export default function BlogDashboard() {
                 letterSpacing: '0.05em',
               }}
             >
-              <div>Title</div>
+              <div>Post</div>
               <div>Category</div>
               <div>Date</div>
               <div>Status</div>
+              <div>Views</div>
               <div>Actions</div>
             </div>
 
@@ -273,47 +274,62 @@ export default function BlogDashboard() {
                 key={post.id}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
+                  gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto',
                   gap: 16,
                   padding: '16px 20px',
                   borderBottom: '1px solid #F1F5F9',
                   alignItems: 'center',
                 }}
               >
-                <div>
-                  <div style={{ fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-                    {post.title}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 8, background: '#F1F5F9', overflow: 'hidden', flexShrink: 0 }}>
+                    {post.featured_image_url ? (
+                      <img src={post.featured_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#CBD5E1' }}>
+                        <FileText size={18} />
+                      </div>
+                    )}
                   </div>
-                  <div style={{ fontSize: 12, color: '#94A3B8' }}>
-                    {post.slug}
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontWeight: 600, color: '#0F172A', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {post.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}>
+                      /{post.slug}
+                    </div>
                   </div>
                 </div>
                 <div style={{ fontSize: 14, color: '#475569' }}>
                   {post.category}
                 </div>
-                <div style={{ fontSize: 14, color: '#94A3B8' }}>
+                <div style={{ fontSize: 13, color: '#94A3B8' }}>
                   {fmt(post.created_at)}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <button
                     onClick={() => handleTogglePublish(post)}
                     style={{
-                      background: 'none',
+                      background: post.is_published ? '#ECFDF5' : '#F8FAFC',
                       border: 'none',
                       cursor: 'pointer',
-                      color: post.is_published ? '#0D9E6E' : '#94A3B8',
-                      padding: '4px',
+                      color: post.is_published ? '#059669' : '#94A3B8',
+                      padding: '4px 8px',
+                      borderRadius: 6,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 4,
-                      fontSize: 12,
-                      fontWeight: 600,
+                      gap: 6,
+                      fontSize: 11,
+                      fontWeight: 700,
                     }}
                     title={post.is_published ? 'Click to draft' : 'Click to publish'}
                   >
-                    {post.is_published ? <Eye size={14} /> : <EyeOff size={14} />}
-                    {post.is_published ? 'Published' : 'Draft'}
+                    {post.is_published ? <Eye size={12} /> : <EyeOff size={12} />}
+                    {post.is_published ? 'LIVE' : 'DRAFT'}
                   </button>
+                </div>
+                <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>
+                  {post.views_count || 0}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button
