@@ -465,6 +465,56 @@ export default function BlogEditor() {
             />
           </div>
 
+          {/* SEO & Metadata */}
+          <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 16 }}>
+              SEO & Metadata
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                  SEO Title
+                </label>
+                <input
+                  type="text"
+                  value={post.seo_title || ''}
+                  onChange={(e) => setPost({ ...post, seo_title: e.target.value })}
+                  placeholder="Custom browser tab title"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                  Meta Description
+                </label>
+                <textarea
+                  value={post.seo_description || ''}
+                  onChange={(e) => setPost({ ...post, seo_description: e.target.value })}
+                  placeholder="Brief summary for search engine results"
+                  rows={2}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Publish Toggle */}
           <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
