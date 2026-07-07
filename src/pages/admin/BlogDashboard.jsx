@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
@@ -114,7 +114,7 @@ export default function BlogDashboard() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        alert('Session expired. Please log in again.');
+        showToast('Session expired. Please log in again.', 'error');
         navigate('/admin/login');
         return;
       }
@@ -134,9 +134,54 @@ export default function BlogDashboard() {
 
       const updated = await res.json();
       setPosts(posts.map((p) => (p.slug === post.slug ? updated.post : p)));
+      showToast(`Post ${!post.is_published ? 'published' : 'moved to drafts'}`);
     } catch (err) {
       console.error('Toggle publish failed:', err);
-      alert('Failed to update post');
+      showToast('Failed to update post', 'error');
+    }
+  };
+
+  const handleDuplicate = async (post) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        showToast('Session expired. Please log in again.', 'error');
+        navigate('/admin/login');
+        return;
+      }
+
+      const duplicatedPost = {
+        ...post,
+        title: `${post.title} (Copy)`,
+        slug: `${post.slug}-copy-${Math.floor(Math.random() * 1000)}`,
+        is_published: false,
+        published_at: null,
+        views_count: 0,
+        likes_count: 0,
+      };
+
+      // Clean up metadata
+      delete duplicatedPost.id;
+      delete duplicatedPost.created_at;
+      delete duplicatedPost.updated_at;
+
+      const res = await fetch('/api/blog/admin/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(duplicatedPost),
+      });
+
+      if (!res.ok) throw new Error('Failed to duplicate post');
+
+      const data = await res.json();
+      setPosts([data.post, ...posts]);
+      showToast('Post duplicated as draft');
+    } catch (err) {
+      console.error('Duplicate failed:', err);
+      showToast('Failed to duplicate post', 'error');
     }
   };
 
@@ -332,6 +377,25 @@ export default function BlogDashboard() {
                   {post.views_count || 0}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    onClick={() => handleDuplicate(post)}
+                    style={{
+                      background: '#F1F5F9',
+                      border: 'none',
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      color: '#64748B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                    title="Duplicate"
+                  >
+                    <Copy size={14} />
+                  </button>
                   <button
                     onClick={() => navigate(`/admin/blog/edit/${post.slug}`)}
                     style={{
