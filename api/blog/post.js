@@ -33,10 +33,31 @@ export default async function handler(req, res) {
         .order('published_at', { ascending: false })
         .limit(3);
 
+      // Fetch Prev/Next posts
+      const { data: prev } = await supabase
+        .from('blog_posts')
+        .select('slug, title')
+        .eq('is_published', true)
+        .lt('published_at', data.published_at)
+        .order('published_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const { data: next } = await supabase
+        .from('blog_posts')
+        .select('slug, title')
+        .eq('is_published', true)
+        .gt('published_at', data.published_at)
+        .order('published_at', { ascending: true })
+        .limit(1)
+        .single();
+
       res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
       return res.status(200).json({
         post: data,
         related: related || [],
+        prev: prev || null,
+        next: next || null,
       });
     } catch (err) {
       console.error('[blog/post]', err);
