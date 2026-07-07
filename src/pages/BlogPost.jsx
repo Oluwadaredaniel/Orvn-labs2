@@ -141,7 +141,28 @@ export default function BlogPost() {
           <h1 className="h-display" style={{ fontSize: 'clamp(34px, 5vw, 56px)', margin: '0 0 18px' }}>
             {post.title}
           </h1>
-          <p className="lead" style={{ marginBottom: 32 }}>{post.excerpt}</p>
+          <p className="lead" style={{ marginBottom: 24 }}>{post.excerpt}</p>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  style={{
+                    background: '#F1F5F9',
+                    color: '#475569',
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="container-page" style={{ maxWidth: 760, paddingBlock: 'clamp(16px, 3vw, 32px)' }}>
