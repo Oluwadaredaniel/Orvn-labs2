@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send, Heart } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -23,6 +23,8 @@ export default function BlogPost() {
   const [copied, setCopied] = useState(false);
   const [comment, setComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -64,6 +66,7 @@ export default function BlogPost() {
       setRelated(data.related || []);
       setPrev(data.prev);
       setNext(data.next);
+      setLikesCount(data.post.likes_count || 0);
 
       // Increment views (fire and forget)
       fetch(`/api/blog/increment-views?slug=${slug}`, { method: 'POST' })
@@ -194,7 +197,34 @@ export default function BlogPost() {
           )}
 
           {/* Share Section */}
-          <div style={{ paddingBottom: 32, borderBottom: '1px solid #F1F5F9', marginBottom: 32 }}>
+          <div style={{ paddingBottom: 32, borderBottom: '1px solid #F1F5F9', marginBottom: 32, display: 'flex', gap: 12 }}>
+            <button
+              onClick={() => {
+                if (!liked) {
+                  setLiked(true);
+                  setLikesCount(prev => prev + 1);
+                  // Fire API to increment likes (optional, can implement later)
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: liked ? '#FEF2F2' : '#fff',
+                border: `1.5px solid ${liked ? '#FECACA' : '#E5E8F0'}`,
+                padding: '8px 16px',
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 600,
+                color: liked ? '#DC2626' : '#475569',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Heart size={16} fill={liked ? '#DC2626' : 'none'} />
+              {likesCount} Likes
+            </button>
+
             <button
               onClick={handleCopyLink}
               style={{
@@ -213,7 +243,7 @@ export default function BlogPost() {
               }}
             >
               {copied ? <Check size={16} /> : <Share2 size={16} />}
-              {copied ? 'Link Copied!' : 'Share Article'}
+              {copied ? 'Link Copied!' : 'Share'}
             </button>
           </div>
         </div>
