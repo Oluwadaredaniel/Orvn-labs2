@@ -244,9 +244,35 @@ export default function Blog() {
               </button>
             </div>
           ) : filteredPosts.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-              <p style={{ fontSize: 16, color: '#94A3B8' }}>No posts in this category yet.</p>
-            </div>
+            <motion.div
+              {...fadeUp(0)}
+              style={{ textAlign: 'center', padding: '80px 20px', background: '#F8FAFC', borderRadius: 20 }}
+            >
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', marginBottom: 8 }}>
+                No posts found
+              </h3>
+              <p style={{ fontSize: 16, color: '#64748B', maxWidth: 400, margin: '0 auto 24px' }}>
+                We couldn't find any articles matching "<strong>{searchQuery}</strong>"{selectedCategory ? ` in ${selectedCategory}` : ''}.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory(null);
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: '#5B3FD4',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Clear filters
+              </button>
+            </motion.div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
               {filteredPosts.map((post, idx) => (
