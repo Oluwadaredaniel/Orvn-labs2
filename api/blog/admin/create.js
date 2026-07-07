@@ -35,7 +35,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const { title, excerpt, body, category, featured_image_url, featured_image_alt, is_published } = req.body;
+    const {
+      title,
+      excerpt,
+      body,
+      category,
+      tags,
+      featured_image_url,
+      featured_image_alt,
+      is_published,
+      seo_title,
+      seo_description,
+      og_image_url,
+      canonical_url,
+      settings
+    } = req.body;
 
     // Validation
     if (!title || !excerpt || !body || !category) {
@@ -54,11 +68,23 @@ export default async function handler(req, res) {
           excerpt,
           body,
           category,
+          tags: tags || [],
           featured_image_url: featured_image_url || null,
           featured_image_alt: featured_image_alt || '',
           is_published: is_published || false,
           read_minutes: readMinutes,
           published_at: is_published ? new Date().toISOString() : null,
+          seo_title: seo_title || title,
+          seo_description: seo_description || excerpt,
+          og_image_url: og_image_url || featured_image_url || null,
+          canonical_url: canonical_url || null,
+          settings: settings || {
+            show_author: true,
+            show_related: true,
+            enable_comments: true,
+            enable_likes: true,
+            is_featured: false
+          }
         },
       ])
       .select()
