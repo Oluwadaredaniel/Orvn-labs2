@@ -220,6 +220,23 @@ export default function BlogDashboard() {
               <Layers size={18} /> Categories
             </button>
             <button
+              onClick={() => navigate('/admin/blog/tags')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '12px 16px',
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Tag size={18} /> Tags
+            </button>
+            <button
               onClick={() => navigate('/admin/blog/create')}
               style={{
                 display: 'flex',
