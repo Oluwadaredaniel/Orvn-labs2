@@ -26,9 +26,21 @@ export default function BlogEditor() {
     excerpt: '',
     body: '',
     category: CATEGORIES[0],
+    tags: [],
     featured_image_url: '',
     featured_image_alt: '',
     is_published: false,
+    seo_title: '',
+    seo_description: '',
+    og_image_url: '',
+    canonical_url: '',
+    settings: {
+      show_author: true,
+      show_related: true,
+      enable_comments: true,
+      enable_likes: true,
+      is_featured: false,
+    },
   });
 
   const [loading, setLoading] = useState(isEditing);
