@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Share2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -21,6 +21,8 @@ export default function BlogPost() {
   const [notFound, setNotFound] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [comment, setComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -276,6 +278,45 @@ export default function BlogPost() {
             </div>
           </div>
         </div>
+
+        {/* Comments Section */}
+        {post.settings?.enable_comments !== false && (
+          <div className="container-page" style={{ maxWidth: 760, marginTop: 48, paddingBottom: 48 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+              <MessageSquare size={20} style={{ color: '#5B3FD4' }} />
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Comments</h3>
+            </div>
+
+            <div style={{ background: '#F8FAFC', borderRadius: 16, padding: 24, border: '1px solid #E2E8F0', marginBottom: 32 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>
+                Share your thoughts
+              </label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="What do you think about this article?"
+                rows={3}
+                style={{ width: '100%', padding: 16, border: '1px solid #E2E8F0', borderRadius: 12, outline: 'none', fontSize: 14, fontFamily: 'inherit', marginBottom: 16, boxSizing: 'border-box' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  disabled={!comment.trim() || submittingComment}
+                  onClick={() => {
+                    setSubmittingComment(true);
+                    setTimeout(() => {
+                      setComment('');
+                      setSubmittingComment(false);
+                      alert('Comments are currently in moderation.');
+                    }, 1000);
+                  }}
+                  style={{ background: '#5B3FD4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, opacity: (!comment.trim() || submittingComment) ? 0.6 : 1 }}
+                >
+                  {submittingComment ? 'Sending...' : 'Post Comment'} <Send size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </article>
 
       <Section borderTop background="surface">
