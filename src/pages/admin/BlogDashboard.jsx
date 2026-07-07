@@ -237,6 +237,23 @@ export default function BlogDashboard() {
               <Tag size={18} /> Tags
             </button>
             <button
+              onClick={() => navigate('/admin/blog/settings')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '12px 16px',
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Settings size={18} /> Settings
+            </button>
+            <button
               onClick={() => navigate('/admin/blog/create')}
               style={{
                 display: 'flex',
