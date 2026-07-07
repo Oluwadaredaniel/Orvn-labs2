@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
@@ -202,6 +202,23 @@ export default function BlogDashboard() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              onClick={() => navigate('/admin/blog/categories')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '12px 16px',
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Layers size={18} /> Categories
+            </button>
             <button
               onClick={() => navigate('/admin/blog/create')}
               style={{
