@@ -27,7 +27,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const { title, excerpt, body, category, featured_image_url, featured_image_alt, is_published } = req.body;
+    const {
+      title,
+      excerpt,
+      body,
+      category,
+      tags,
+      featured_image_url,
+      featured_image_alt,
+      is_published,
+      seo_title,
+      seo_description,
+      og_image_url,
+      canonical_url,
+      settings
+    } = req.body;
 
     const readMinutes = body ? Math.ceil(body.split(/\s+/).length / 200) : undefined;
 
@@ -36,6 +50,7 @@ export default async function handler(req, res) {
     if (excerpt !== undefined) updateData.excerpt = excerpt;
     if (body !== undefined) updateData.body = body;
     if (category !== undefined) updateData.category = category;
+    if (tags !== undefined) updateData.tags = tags;
     if (featured_image_url !== undefined) updateData.featured_image_url = featured_image_url;
     if (featured_image_alt !== undefined) updateData.featured_image_alt = featured_image_alt;
     if (is_published !== undefined) {
@@ -43,6 +58,11 @@ export default async function handler(req, res) {
       updateData.published_at = is_published ? new Date().toISOString() : null;
     }
     if (readMinutes !== undefined) updateData.read_minutes = readMinutes;
+    if (seo_title !== undefined) updateData.seo_title = seo_title;
+    if (seo_description !== undefined) updateData.seo_description = seo_description;
+    if (og_image_url !== undefined) updateData.og_image_url = og_image_url;
+    if (canonical_url !== undefined) updateData.canonical_url = canonical_url;
+    if (settings !== undefined) updateData.settings = settings;
 
     updateData.updated_at = new Date().toISOString();
 
