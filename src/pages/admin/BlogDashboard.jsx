@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
@@ -199,6 +199,28 @@ export default function BlogDashboard() {
 
       {/* Content */}
       <div className="container-page" style={{ padding: '40px 0' }}>
+        {/* Stats Row */}
+        {!loading && posts.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 40 }}>
+            {[
+              { label: 'Total Posts', value: posts.length, icon: <FileText size={20} />, color: '#5B3FD4' },
+              { label: 'Published', value: posts.filter(p => p.is_published).length, icon: <CheckCircle size={20} />, color: '#0D9E6E' },
+              { label: 'Drafts', value: posts.filter(p => !p.is_published).length, icon: <BookOpen size={20} />, color: '#94A3B8' },
+              { label: 'Total Views', value: posts.reduce((acc, p) => acc + (p.views_count || 0), 0), icon: <BarChart2 size={20} />, color: '#F59E0B' },
+            ].map((stat, i) => (
+              <div key={i} style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #E5E8F0', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ background: `${stat.color}10`, color: stat.color, padding: 12, borderRadius: 10 }}>
+                  {stat.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: '#0F172A' }}>{stat.value}</div>
+                  <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
             Loading posts...
