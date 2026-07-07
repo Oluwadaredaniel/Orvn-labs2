@@ -19,6 +19,30 @@ const fadeUp = (delay = 0) => ({
 const fmt = (iso) =>
   new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+const BlogSkeleton = () => (
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, width: '100%' }}>
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="card" style={{ padding: 0, height: 440, overflow: 'hidden' }}>
+        <div style={{ height: 200, background: '#F1F5F9', animation: 'pulse 1.5s infinite' }} />
+        <div style={{ padding: 24 }}>
+          <div style={{ height: 12, width: '30%', background: '#F1F5F9', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 24, width: '80%', background: '#F1F5F9', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 16, width: '100%', background: '#F1F5F9', marginBottom: 8, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 16, width: '90%', background: '#F1F5F9', marginBottom: 24, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 12, width: '50%', background: '#F1F5F9', borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+        </div>
+      </div>
+    ))}
+    <style>{`
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+    `}</style>
+  </div>
+);
+
 export default function Blog() {
   useDocumentMeta({
     title: 'Blog',
@@ -221,9 +245,7 @@ export default function Blog() {
 
           {/* Loading State */}
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
-              Loading posts...
-            </div>
+            <BlogSkeleton />
           ) : error ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: '#DC2626' }}>
               <p>{error}</p>
