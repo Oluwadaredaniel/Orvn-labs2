@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -28,6 +29,7 @@ export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -59,9 +61,12 @@ export default function Blog() {
     }
   };
 
-  const filteredPosts = selectedCategory
-    ? posts.filter((p) => p.category === selectedCategory)
-    : posts;
+  const filteredPosts = posts.filter((post) => {
+    const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <PageWrapper>
@@ -99,6 +104,73 @@ export default function Blog() {
 
       <Section borderTop background="surface">
         <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 clamp(16px, 5vw, 48px)' }}>
+          {/* Search Bar */}
+          <motion.div
+            {...fadeUp(0)}
+            style={{
+              maxWidth: 500,
+              margin: '0 auto clamp(24px, 4vw, 32px)',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#94A3B8',
+                display: 'flex',
+                alignItems: 'center',
+                pointerEvents: 'none',
+              }}
+            >
+              <Search size={18} />
+            </div>
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px 14px 44px',
+                borderRadius: 14,
+                border: '1.5px solid #E5E8F0',
+                fontSize: 15,
+                outline: 'none',
+                transition: 'all 0.2s',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#5B3FD4')}
+              onBlur={(e) => (e.target.style.borderColor = '#E5E8F0')}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: 100,
+                  width: 24,
+                  height: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                }}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </motion.div>
+
           {/* Category Filter */}
           <motion.div
             {...fadeUp(0)}
