@@ -71,6 +71,22 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('blog-images', 'blog-images', true)
 ON CONFLICT (id) DO NOTHING;
 
+-- Create authors table
+CREATE TABLE IF NOT EXISTS authors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  avatar_url TEXT,
+  bio TEXT,
+  twitter_url TEXT,
+  linkedin_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS on authors
+ALTER TABLE authors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authors are viewable by anyone" ON authors FOR SELECT USING (true);
+CREATE POLICY "Admins can manage authors" ON authors FOR ALL USING (auth.role() = 'authenticated');
+
 -- Storage policy: public read
 CREATE POLICY "Public Access" ON storage.objects
   FOR SELECT USING (bucket_id = 'blog-images');
