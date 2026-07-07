@@ -58,6 +58,10 @@ export default function BlogPost() {
       const data = await res.json();
       setPost(data.post);
       setRelated(data.related || []);
+
+      // Increment views (fire and forget)
+      fetch(`/api/blog/increment-views?slug=${slug}`, { method: 'POST' })
+        .catch((err) => console.warn('Failed to increment views:', err));
     } catch (err) {
       console.error('Failed to load post:', err);
       setNotFound(true);
