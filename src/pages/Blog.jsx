@@ -53,6 +53,7 @@ export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedTag, setSelectedTag] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -87,9 +88,10 @@ export default function Blog() {
 
   const filteredPosts = posts.filter((post) => {
     const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
+    const matchesTag = selectedTag ? (post.tags || []).includes(selectedTag) : true;
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesTag && matchesSearch;
   });
 
   return (
@@ -243,6 +245,30 @@ export default function Blog() {
             ))}
           </motion.div>
 
+          {selectedTag && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+              <div style={{
+                background: '#F1F5F9',
+                padding: '6px 12px',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#475569',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                Filtered by tag: <strong>#{selectedTag}</strong>
+                <button
+                  onClick={() => setSelectedTag(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, fontSize: 18 }}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Loading State */}
           {loading ? (
             <BlogSkeleton />
@@ -390,6 +416,36 @@ export default function Blog() {
                         <span>·</span>
                         <span>{post.read_minutes} min read</span>
                       </div>
+
+                      {/* Card Tags */}
+                      {post.tags && post.tags.length > 0 && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+                          {post.tags.map(tag => (
+                            <button
+                              key={tag}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedTag(tag);
+                                window.scrollTo({ top: 400, behavior: 'smooth' });
+                              }}
+                              style={{
+                                background: '#F8FAFC',
+                                border: '1px solid #E2E8F0',
+                                borderRadius: 4,
+                                padding: '2px 6px',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: '#64748B',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              #{tag}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
                       <Link
                         to={`/blog/${post.slug}`}
                         style={{
