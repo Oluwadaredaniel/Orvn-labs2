@@ -17,6 +17,7 @@ import FAQ from './pages/FAQ';
 import AdminLogin from './pages/admin/AdminLogin';
 import BlogDashboard from './pages/admin/BlogDashboard';
 import BlogEditor from './pages/admin/BlogEditor';
+import BlogCategories from './pages/admin/BlogCategories';
 // import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 
@@ -68,6 +69,7 @@ function AnimatedRoutes() {
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/blog" element={<BlogDashboard />} />
+        <Route path="/admin/blog/categories" element={<BlogCategories />} />
         <Route path="/admin/blog/create" element={<BlogEditor />} />
         <Route path="/admin/blog/edit/:slug" element={<BlogEditor />} />
 
