@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Upload, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Trash2, Eye, Layout } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import RichTextEditor from '../../components/RichTextEditor';
+import ContentRenderer from '../../components/ContentRenderer';
 
 const CATEGORIES = [
   'First-contact infrastructure',
@@ -45,6 +46,7 @@ export default function BlogEditor() {
 
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [user, setUser] = useState(null);
@@ -206,30 +208,51 @@ export default function BlogEditor() {
           >
             <ArrowLeft size={18} /> Back
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              background: '#5B3FD4',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: 8,
-              fontWeight: 600,
-              cursor: saving ? 'wait' : 'pointer',
-              opacity: saving ? 0.7 : 1,
-            }}
-          >
-            <Save size={16} /> {saving ? 'Saving...' : 'Save Post'}
-          </button>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              type="button"
+              onClick={() => setShowPreview(!showPreview)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: showPreview ? '#EEEAFB' : '#fff',
+                color: showPreview ? '#5B3FD4' : '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '10px 20px',
+                borderRadius: 8,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {showPreview ? <Layout size={16} /> : <Eye size={16} />}
+              {showPreview ? 'Edit Mode' : 'Live Preview'}
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#5B3FD4',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: 8,
+                fontWeight: 600,
+                cursor: saving ? 'wait' : 'pointer',
+                opacity: saving ? 0.7 : 1,
+              }}
+            >
+              <Save size={16} /> {saving ? 'Saving...' : 'Save Post'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container-page" style={{ maxWidth: 900, paddingBlock: '40px' }}>
+      <div className="container-page" style={{ maxWidth: showPreview ? 1400 : 900, paddingBlock: '40px' }}>
         {error && (
           <div
             style={{
@@ -245,8 +268,14 @@ export default function BlogEditor() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {/* Title */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr',
+          gap: 40,
+          alignItems: 'start'
+        }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {/* Title */}
           <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
               Post Title *
@@ -577,7 +606,47 @@ export default function BlogEditor() {
             </label>
           </div>
         </form>
+
+        {/* Preview Panel */}
+        {showPreview && (
+          <div style={{
+            background: '#fff',
+            border: '1px solid #E5E8F0',
+            borderRadius: 12,
+            padding: '40px',
+            position: 'sticky',
+            top: 100,
+            maxHeight: 'calc(100vh - 140px)',
+            overflowY: 'auto',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+          }}>
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ padding: '4px 10px', background: '#F1F5F9', borderRadius: 100, fontSize: 11, fontWeight: 700, color: '#475569' }}>
+                PREVIEW
+              </div>
+              <div style={{ height: 1, flex: 1, background: '#F1F5F9' }} />
+            </div>
+
+            {post.featured_image_url && (
+              <img
+                src={post.featured_image_url}
+                alt=""
+                style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 8, marginBottom: 24 }}
+              />
+            )}
+            <h1 style={{ fontSize: 32, fontWeight: 800, color: '#0F172A', marginBottom: 16, lineHeight: 1.2 }}>
+              {post.title || 'Untitled Post'}
+            </h1>
+            <p style={{ fontSize: 16, color: '#475569', lineHeight: 1.6, marginBottom: 32, fontWeight: 500 }}>
+              {post.excerpt}
+            </p>
+            <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 32 }}>
+              <ContentRenderer html={post.body} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 }
