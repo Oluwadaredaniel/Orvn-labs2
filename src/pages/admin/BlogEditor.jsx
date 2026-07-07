@@ -47,12 +47,14 @@ export default function BlogEditor() {
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [authors, setAuthors] = useState([]);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     checkAuth();
+    loadAuthors();
     if (isEditing) {
       loadPost();
     }
@@ -65,6 +67,18 @@ export default function BlogEditor() {
       return;
     }
     setUser(user);
+  };
+
+  const loadAuthors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('authors')
+        .select('id, name');
+      if (error) throw error;
+      setAuthors(data || []);
+    } catch (err) {
+      console.warn('Failed to load authors:', err);
+    }
   };
 
   const loadPost = async () => {
@@ -326,6 +340,31 @@ export default function BlogEditor() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Author
+                </label>
+                <select
+                  value={post.author || ''}
+                  onChange={(e) => setPost({ ...post, author: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontFamily: "'Inter', sans-serif",
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="">ORVN Labs (Default)</option>
+                  {authors.map((auth) => (
+                    <option key={auth.id} value={auth.name}>{auth.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
                   Category *
                 </label>
                 <select
@@ -344,6 +383,31 @@ export default function BlogEditor() {
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Author
+                </label>
+                <select
+                  value={post.author || ''}
+                  onChange={(e) => setPost({ ...post, author: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #E5E8F0',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontFamily: "'Inter', sans-serif",
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="">ORVN Labs (Default)</option>
+                  {authors.map((auth) => (
+                    <option key={auth.id} value={auth.name}>{auth.name}</option>
                   ))}
                 </select>
               </div>
