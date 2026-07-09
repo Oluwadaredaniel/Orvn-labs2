@@ -27,7 +27,10 @@ export default function BlogPost() {
   const [toc, setToc] = useState([]);
   const [processedBody, setProcessedBody] = useState('');
   const [copied, setCopied] = useState(false);
+  const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
+  const [commenterName, setCommenterName] = useState('');
+  const [commenterEmail, setCommenterEmail] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -40,11 +43,55 @@ export default function BlogPost() {
 
   useEffect(() => {
     loadPost();
+    loadComments();
     const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
     if (likedPosts.includes(slug)) {
       setLiked(true);
     }
   }, [slug]);
+
+  const loadComments = async () => {
+    try {
+      const res = await fetch(`/api/blog/comments/list?slug=${slug}`);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments || []);
+      }
+    } catch (err) {
+      console.warn('Failed to load comments:', err);
+    }
+  };
+
+  const handlePostComment = async (e) => {
+    e.preventDefault();
+    if (!comment.trim() || !commenterName.trim() || !commenterEmail.trim()) return;
+
+    setSubmittingComment(true);
+    try {
+      const res = await fetch('/api/blog/comments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          content: comment,
+          author_name: commenterName,
+          author_email: commenterEmail,
+        }),
+      });
+
+      if (res.ok) {
+        setComment('');
+        alert('Your comment has been submitted and is awaiting moderation.');
+      } else {
+        alert('Failed to submit comment. Please try again.');
+      }
+    } catch (err) {
+      console.error('Comment error:', err);
+      alert('An error occurred.');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
 
   const handleLike = async () => {
     if (liked) return;
@@ -463,37 +510,81 @@ export default function BlogPost() {
           <div className="container-page" style={{ maxWidth: 760, marginTop: 48, paddingBottom: 48 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
               <MessageSquare size={20} style={{ color: '#5B3FD4' }} />
-              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Comments</h3>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Comments ({comments.length})</h3>
             </div>
 
-            <div style={{ background: '#F8FAFC', borderRadius: 16, padding: 24, border: '1px solid #E2E8F0', marginBottom: 32 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 12 }}>
-                Share your thoughts
-              </label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="What do you think about this article?"
-                rows={3}
-                style={{ width: '100%', padding: 16, border: '1px solid #E2E8F0', borderRadius: 12, outline: 'none', fontSize: 14, fontFamily: 'inherit', marginBottom: 16, boxSizing: 'border-box' }}
-              />
+            {/* Existing Comments */}
+            {comments.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 40 }}>
+                {comments.map((c) => (
+                  <div key={c.id} style={{ display: 'flex', gap: 16 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#475569', fontSize: 14, flexShrink: 0 }}>
+                      {c.author_name[0]}
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{c.author_name}</span>
+                        <span style={{ fontSize: 12, color: '#94A3B8' }}>{fmt(c.created_at)}</span>
+                      </div>
+                      <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                        {c.content}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <form onSubmit={handlePostComment} style={{ background: '#F8FAFC', borderRadius: 16, padding: 24, border: '1px solid #E2E8F0', marginBottom: 32 }}>
+              <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700 }}>Leave a comment</h4>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>NAME</label>
+                  <input
+                    type="text"
+                    required
+                    value={commenterName}
+                    onChange={(e) => setCommenterName(e.target.value)}
+                    placeholder="Your name"
+                    style={{ width: '100%', padding: 12, border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 14, outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>EMAIL (PRIVATE)</label>
+                  <input
+                    type="email"
+                    required
+                    value={commenterEmail}
+                    onChange={(e) => setCommenterEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    style={{ width: '100%', padding: 12, border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 14, outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>COMMENT</label>
+                <textarea
+                  required
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="What do you think about this article?"
+                  rows={3}
+                  style={{ width: '100%', padding: 16, border: '1px solid #E2E8F0', borderRadius: 12, outline: 'none', fontSize: 14, fontFamily: 'inherit', marginBottom: 16, boxSizing: 'border-box' }}
+                />
+              </div>
+
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button
-                  disabled={!comment.trim() || submittingComment}
-                  onClick={() => {
-                    setSubmittingComment(true);
-                    setTimeout(() => {
-                      setComment('');
-                      setSubmittingComment(false);
-                      alert('Comments are currently in moderation.');
-                    }, 1000);
-                  }}
-                  style={{ background: '#5B3FD4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, opacity: (!comment.trim() || submittingComment) ? 0.6 : 1 }}
+                  type="submit"
+                  disabled={submittingComment}
+                  style={{ background: '#5B3FD4', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, opacity: submittingComment ? 0.6 : 1 }}
                 >
                   {submittingComment ? 'Sending...' : 'Post Comment'} <Send size={16} />
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
       </article>

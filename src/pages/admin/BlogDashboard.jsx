@@ -12,6 +12,7 @@ export default function BlogDashboard() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [pendingComments, setPendingComments] = useState(0);
 
   // Modal State
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, slug: '', title: '' });
@@ -31,6 +32,7 @@ export default function BlogDashboard() {
       }
       setUser(user);
       loadPosts();
+      loadPendingComments();
     } catch (err) {
       console.error('Auth check failed:', err);
       navigate('/admin/login');
@@ -52,6 +54,19 @@ export default function BlogDashboard() {
       alert('Failed to load posts');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPendingComments = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('blog_comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (!error) setPendingComments(count || 0);
+    } catch (err) {
+      console.warn('Failed to load comments count:', err);
     }
   };
 
@@ -254,6 +269,23 @@ export default function BlogDashboard() {
               <Users size={18} /> Authors
             </button>
             <button
+              onClick={() => navigate('/admin/blog/comments')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '12px 16px',
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <MessageSquare size={18} /> Comments
+            </button>
+            <button
               onClick={() => navigate('/admin/blog/settings')}
               style={{
                 display: 'flex',
@@ -317,11 +349,27 @@ export default function BlogDashboard() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginBottom: 40 }}>
             {[
               { label: 'Total Posts', value: posts.length, icon: <FileText size={20} />, color: '#5B3FD4' },
-              { label: 'Published', value: posts.filter(p => p.is_published).length, icon: <CheckCircle size={20} />, color: '#0D9E6E' },
               { label: 'Total Views', value: posts.reduce((acc, p) => acc + (p.views_count || 0), 0), icon: <BarChart2 size={20} />, color: '#F59E0B' },
               { label: 'Total Likes', value: posts.reduce((acc, p) => acc + (p.likes_count || 0), 0), icon: <Heart size={20} />, color: '#EF4444' },
+              { label: 'Pending Comments', value: pendingComments, icon: <MessageSquare size={20} />, color: '#D97706', onClick: () => navigate('/admin/blog/comments') },
             ].map((stat, i) => (
-              <div key={i} style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #E5E8F0', display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div
+                key={i}
+                onClick={stat.onClick}
+                style={{
+                  background: '#fff',
+                  padding: 24,
+                  borderRadius: 12,
+                  border: '1px solid #E5E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  cursor: stat.onClick ? 'pointer' : 'default',
+                  transition: 'transform 0.2s',
+                }}
+                onMouseEnter={(e) => stat.onClick && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                onMouseLeave={(e) => stat.onClick && (e.currentTarget.style.transform = 'translateY(0)')}
+              >
                 <div style={{ background: `${stat.color}10`, color: stat.color, padding: 12, borderRadius: 10 }}>
                   {stat.icon}
                 </div>

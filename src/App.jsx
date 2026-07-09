@@ -21,6 +21,7 @@ import BlogCategories from './pages/admin/BlogCategories';
 import BlogTags from './pages/admin/BlogTags';
 import BlogSettings from './pages/admin/BlogSettings';
 import BlogAuthors from './pages/admin/BlogAuthors';
+import BlogComments from './pages/admin/BlogComments';
 // import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 
@@ -76,6 +77,7 @@ function AnimatedRoutes() {
         <Route path="/admin/blog/tags" element={<BlogTags />} />
         <Route path="/admin/blog/settings" element={<BlogSettings />} />
         <Route path="/admin/blog/authors" element={<BlogAuthors />} />
+        <Route path="/admin/blog/comments" element={<BlogComments />} />
         <Route path="/admin/blog/create" element={<BlogEditor />} />
         <Route path="/admin/blog/edit/:slug" element={<BlogEditor />} />
 
