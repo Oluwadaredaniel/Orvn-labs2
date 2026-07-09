@@ -17,6 +17,7 @@ export default function BlogPost() {
   const isPreview = searchParams.get('preview') === 'true';
 
   const [post, setPost] = useState(null);
+  const [author, setAuthor] = useState(null);
   const [related, setRelated] = useState([]);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
@@ -68,6 +69,7 @@ export default function BlogPost() {
 
       const data = await res.json();
       setPost(data.post);
+      setAuthor(data.authorDetails);
       setRelated(data.related || []);
       setPrev(data.prev);
       setNext(data.next);
@@ -194,12 +196,16 @@ export default function BlogPost() {
 
           {/* Author Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#EEEAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#5B3FD4', fontSize: 14 }}>
-              {post.author?.[0] || 'O'}
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#EEEAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#5B3FD4', fontSize: 14, overflow: 'hidden' }}>
+              {author?.avatar_url ? (
+                <img src={author.avatar_url} alt={author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                post.author?.[0] || 'O'
+              )}
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{post.author || 'ORVN Labs'}</div>
-              <div style={{ fontSize: 12, color: '#94A3B8' }}>{post.category} · {fmt(post.published_at)}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A' }}>{author?.name || post.author || 'ORVN Labs'}</div>
+              <div style={{ fontSize: 12, color: '#94A3B8' }}>{author?.role || post.category} · {fmt(post.published_at)}</div>
             </div>
           </div>
 
@@ -347,6 +353,31 @@ export default function BlogPost() {
         <div className="container-page" style={{ maxWidth: 760, paddingBlock: 'clamp(16px, 3vw, 32px)' }}>
           <ContentRenderer html={processedBody || post.body} />
         </div>
+
+        {/* Author Bio Section */}
+        {author && (
+          <div className="container-page" style={{ maxWidth: 760, marginTop: 40, paddingTop: 40, borderTop: '1px solid #F1F5F9' }}>
+            <div style={{ background: '#F8FAFC', borderRadius: 20, padding: 32, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#EEEAFB', overflow: 'hidden', flexShrink: 0 }}>
+                {author.avatar_url ? (
+                   <img src={author.avatar_url} alt={author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800, color: '#5B3FD4' }}>{author.name[0]}</div>
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#5B3FD4', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Written by</div>
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', margin: '0 0 8px' }}>{author.name}</h3>
+                <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6, margin: '0 0 16px' }}>{author.bio}</p>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  {author.twitter_url && <a href={author.twitter_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Twitter size={18} /></a>}
+                  {author.github_url && <a href={author.github_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Linkedin size={18} /></a>}
+                  {author.website_url && <a href={author.website_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Share2 size={18} /></a>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Article Navigation */}
         {(prev || next) && (

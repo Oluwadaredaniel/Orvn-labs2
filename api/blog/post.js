@@ -27,6 +27,17 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'post_not_found' });
       }
 
+      // Fetch full author details if available
+      let authorDetails = null;
+      if (data.author) {
+        const { data: authorData } = await supabase
+          .from('blog_authors')
+          .select('*')
+          .eq('name', data.author)
+          .maybeSingle();
+        authorDetails = authorData;
+      }
+
       // Fetch related posts
       const { data: related } = await supabase
         .from('blog_posts')
@@ -59,6 +70,7 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
       return res.status(200).json({
         post: data,
+        authorDetails,
         related: related || [],
         prev: prev || null,
         next: next || null,
