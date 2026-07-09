@@ -11,11 +11,33 @@ export default function BlogSettings() {
     enable_comments_globally: true,
     enable_likes_globally: true,
     show_views_publicly: true,
+    enable_sharing: true,
     default_social_image: '',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/blog/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.settings) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const showToast = (message) => {
     setToast({ show: true, message });
@@ -24,11 +46,23 @@ export default function BlogSettings() {
 
   const handleSave = async () => {
     setSaving(true);
-    // In a real app, we would save this to a 'settings' table or a JSON config in Supabase
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/blog/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings }),
+      });
+      if (res.ok) {
+        showToast('Global settings saved successfully');
+      } else {
+        showToast('Failed to save settings');
+      }
+    } catch (err) {
+      console.error('Error saving settings:', err);
+      showToast('Error saving settings');
+    } finally {
       setSaving(false);
-      showToast('Global settings saved successfully');
-    }, 1000);
+    }
   };
 
   return (
@@ -53,7 +87,10 @@ export default function BlogSettings() {
       </div>
 
       <div className="container-page" style={{ maxWidth: 800, paddingBlock: 40 }}>
-        <div style={{ display: 'grid', gap: 24 }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 40, color: '#94A3B8' }}>Loading settings...</div>
+        ) : (
+          <div style={{ display: 'grid', gap: 24 }}>
           {/* General */}
           <div style={{ background: '#fff', borderRadius: 12, padding: 24, border: '1px solid #E5E8F0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
@@ -106,7 +143,7 @@ export default function BlogSettings() {
                ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {toast.show && (
