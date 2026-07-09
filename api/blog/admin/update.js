@@ -32,6 +32,7 @@ export default async function handler(req, res) {
       excerpt,
       body,
       category,
+      author,
       tags,
       featured_image_url,
       featured_image_alt,
@@ -50,6 +51,7 @@ export default async function handler(req, res) {
     if (excerpt !== undefined) updateData.excerpt = excerpt;
     if (body !== undefined) updateData.body = body;
     if (category !== undefined) updateData.category = category;
+    if (author !== undefined) updateData.author = author;
     if (tags !== undefined) updateData.tags = tags;
     if (featured_image_url !== undefined) updateData.featured_image_url = featured_image_url;
     if (featured_image_alt !== undefined) updateData.featured_image_alt = featured_image_alt;

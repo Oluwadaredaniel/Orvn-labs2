@@ -27,6 +27,7 @@ export default function BlogEditor() {
     excerpt: '',
     body: '',
     category: CATEGORIES[0],
+    author: '',
     tags: [],
     featured_image_url: '',
     featured_image_alt: '',
