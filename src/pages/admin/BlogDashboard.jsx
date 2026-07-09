@@ -15,6 +15,7 @@ export default function BlogDashboard() {
   const [pendingComments, setPendingComments] = useState(0);
   const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [recentComments, setRecentComments] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Modal State
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, slug: '', title: '' });
@@ -420,7 +421,19 @@ export default function BlogDashboard() {
            {/* Post List */}
            <div>
              <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-               {/* ... (keep existing post list header) */}
+               <div style={{ padding: '16px 20px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                 <div style={{ fontWeight: 700, fontSize: 13, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recent Posts</div>
+                 <div style={{ position: 'relative', width: 240 }}>
+                   <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                   <input
+                     type="text"
+                     placeholder="Search posts..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     style={{ width: '100%', padding: '6px 10px 6px 30px', borderRadius: 6, border: '1px solid #E5E8F0', outline: 'none', fontSize: 13 }}
+                   />
+                 </div>
+               </div>
             <div
               style={{
                 display: 'grid',
@@ -444,7 +457,12 @@ export default function BlogDashboard() {
               <div>Actions</div>
             </div>
 
-            {posts.map((post) => (
+            {posts
+              .filter(p =>
+                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.slug.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((post) => (
               /* ... existing post map items ... */
             ))}
           </div>
