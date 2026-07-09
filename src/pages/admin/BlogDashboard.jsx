@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink, Mail } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
@@ -13,6 +13,7 @@ export default function BlogDashboard() {
   const [loading, setLoading] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [pendingComments, setPendingComments] = useState(0);
+  const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [recentComments, setRecentComments] = useState([]);
 
   // Modal State
@@ -74,6 +75,12 @@ export default function BlogDashboard() {
         .limit(5);
 
       if (!recentErr) setRecentComments(recent || []);
+
+      const { count: subCount, error: subErr } = await supabase
+        .from('newsletter_subscribers')
+        .select('*', { count: 'exact', head: true });
+
+      if (!subErr) setTotalSubscribers(subCount || 0);
     } catch (err) {
       console.warn('Failed to load comments data:', err);
     }
@@ -295,6 +302,23 @@ export default function BlogDashboard() {
               <MessageSquare size={18} /> Comments
             </button>
             <button
+              onClick={() => navigate('/admin/blog/subscribers')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: '#475569',
+                border: '1px solid #E5E8F0',
+                padding: '12px 16px',
+                borderRadius: 10,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Mail size={18} /> Subscribers
+            </button>
+            <button
               onClick={() => navigate('/admin/blog/settings')}
               style={{
                 display: 'flex',
@@ -359,7 +383,7 @@ export default function BlogDashboard() {
             {[
               { label: 'Total Posts', value: posts.length, icon: <FileText size={20} />, color: '#5B3FD4' },
               { label: 'Total Views', value: posts.reduce((acc, p) => acc + (p.views_count || 0), 0), icon: <BarChart2 size={20} />, color: '#F59E0B' },
-              { label: 'Total Likes', value: posts.reduce((acc, p) => acc + (p.likes_count || 0), 0), icon: <Heart size={20} />, color: '#EF4444' },
+              { label: 'Subscribers', value: totalSubscribers, icon: <Mail size={20} />, color: '#0EA5E9', onClick: () => navigate('/admin/blog/subscribers') },
               { label: 'Pending Comments', value: pendingComments, icon: <MessageSquare size={20} />, color: '#D97706', onClick: () => navigate('/admin/blog/comments') },
             ].map((stat, i) => (
               <div
