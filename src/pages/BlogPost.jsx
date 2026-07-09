@@ -40,7 +40,34 @@ export default function BlogPost() {
 
   useEffect(() => {
     loadPost();
+    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+    if (likedPosts.includes(slug)) {
+      setLiked(true);
+    }
   }, [slug]);
+
+  const handleLike = async () => {
+    if (liked) return;
+
+    setLiked(true);
+    setLikesCount(prev => prev + 1);
+
+    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+    if (!likedPosts.includes(slug)) {
+      likedPosts.push(slug);
+      localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+    }
+
+    try {
+      const res = await fetch(`/api/blog/increment-likes?slug=${slug}`, { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        setLikesCount(data.likes_count);
+      }
+    } catch (err) {
+      console.warn('Failed to increment likes:', err);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -259,13 +286,8 @@ export default function BlogPost() {
           {/* Share Section */}
           <div style={{ paddingBottom: 32, borderBottom: '1px solid #F1F5F9', marginBottom: 32, display: 'flex', gap: 12 }}>
             <button
-              onClick={() => {
-                if (!liked) {
-                  setLiked(true);
-                  setLikesCount(prev => prev + 1);
-                  // Fire API to increment likes (optional, can implement later)
-                }
-              }}
+              onClick={handleLike}
+              disabled={liked}
               style={{
                 display: 'flex',
                 alignItems: 'center',
