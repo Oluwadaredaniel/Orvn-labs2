@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink, Mail } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink, Mail, Send } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
@@ -214,6 +214,30 @@ export default function BlogDashboard() {
     } catch (err) {
       console.error('Duplicate failed:', err);
       showToast('Failed to duplicate post', 'error');
+    }
+  };
+
+  const handleSendEmail = async (post) => {
+    if (post.last_broadcast_at) return;
+    if (!window.confirm(`Send "${post.title}" to ${totalSubscribers} subscribers?`)) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/api/blog/admin/update?slug=${post.slug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ last_broadcast_at: new Date().toISOString() })
+      });
+
+      if (res.ok) {
+        showToast('Email broadcast initiated!');
+        loadPosts();
+      }
+    } catch (err) {
+      console.error('Email error:', err);
     }
   };
 
@@ -546,6 +570,30 @@ export default function BlogDashboard() {
                     >
                       <ExternalLink size={14} />
                     </a>
+
+                    {post.is_published && new Date(post.published_at) <= new Date() && (
+                      <button
+                        onClick={() => handleSendEmail(post)}
+                        disabled={post.last_broadcast_at}
+                        style={{
+                          background: post.last_broadcast_at ? '#F1F5F9' : '#F0F9FF',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: 6,
+                          cursor: post.last_broadcast_at ? 'default' : 'pointer',
+                          color: post.last_broadcast_at ? '#94A3B8' : '#0369A1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: 12,
+                          fontWeight: 600,
+                        }}
+                        title={post.last_broadcast_at ? `Sent on ${new Date(post.last_broadcast_at).toLocaleDateString()}` : 'Send to subscribers'}
+                      >
+                        <Send size={14} />
+                      </button>
+                    )}
+
                     <button
                       onClick={() => handleDuplicate(post)}
                       style={{

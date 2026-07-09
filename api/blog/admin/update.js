@@ -42,7 +42,8 @@ export default async function handler(req, res) {
       og_image_url,
       canonical_url,
       settings,
-      published_at
+      published_at,
+      last_broadcast_at
     } = req.body;
 
     const readMinutes = body ? Math.ceil(body.split(/\s+/).length / 200) : undefined;
@@ -72,6 +73,7 @@ export default async function handler(req, res) {
     if (og_image_url !== undefined) updateData.og_image_url = og_image_url;
     if (canonical_url !== undefined) updateData.canonical_url = canonical_url;
     if (settings !== undefined) updateData.settings = settings;
+    if (last_broadcast_at !== undefined) updateData.last_broadcast_at = last_broadcast_at;
 
     updateData.updated_at = new Date().toISOString();
 
