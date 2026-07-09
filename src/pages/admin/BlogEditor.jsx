@@ -71,11 +71,11 @@ export default function BlogEditor() {
 
   const loadAuthors = async () => {
     try {
-      const { data, error } = await supabase
-        .from('authors')
-        .select('id, name');
-      if (error) throw error;
-      setAuthors(data || []);
+      const res = await fetch('/api/blog/admin/authors');
+      if (res.ok) {
+        const data = await res.json();
+        setAuthors(data.authors || []);
+      }
     } catch (err) {
       console.warn('Failed to load authors:', err);
     }
@@ -383,31 +383,6 @@ export default function BlogEditor() {
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
-                  Author
-                </label>
-                <select
-                  value={post.author || ''}
-                  onChange={(e) => setPost({ ...post, author: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #E5E8F0',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontFamily: "'Inter', sans-serif",
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="">ORVN Labs (Default)</option>
-                  {authors.map((auth) => (
-                    <option key={auth.id} value={auth.name}>{auth.name}</option>
                   ))}
                 </select>
               </div>

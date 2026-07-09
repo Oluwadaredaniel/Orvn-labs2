@@ -56,33 +56,66 @@ export default function Blog() {
   const [selectedTag, setSelectedTag] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 9;
 
   useEffect(() => {
-    loadPostsAndCategories();
+    loadCategories();
+    loadPosts(true);
   }, []);
 
-  const loadPostsAndCategories = async () => {
+  useEffect(() => {
+    loadPosts(true);
+  }, [selectedCategory]);
+
+  const loadCategories = async () => {
     try {
-      setLoading(true);
-      setError('');
-
-      // Load posts
-      const postsRes = await fetch('/api/blog/list');
-      if (!postsRes.ok) throw new Error('Failed to load posts');
-      const postsData = await postsRes.json();
-      setPosts(postsData.posts || []);
-
-      // Load categories
-      const categoriesRes = await fetch('/api/blog/categories');
-      if (!categoriesRes.ok) throw new Error('Failed to load categories');
-      const categoriesData = await categoriesRes.json();
-      setCategories(categoriesData.categories || []);
+      const res = await fetch('/api/blog/categories');
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data.categories || []);
+      }
     } catch (err) {
-      console.error('Failed to load blog data:', err);
+      console.warn('Failed to load categories:', err);
+    }
+  };
+
+  const loadPosts = async (reset = false) => {
+    try {
+      if (reset) {
+        setLoading(true);
+        setOffset(0);
+      } else {
+        setLoadingMore(true);
+      }
+
+      setError('');
+      const currentOffset = reset ? 0 : offset;
+      const categoryQuery = selectedCategory ? `&category=${selectedCategory}` : '';
+
+      const res = await fetch(`/api/blog/list?limit=${LIMIT}&offset=${currentOffset}${categoryQuery}`);
+      if (!res.ok) throw new Error('Failed to load posts');
+
+      const data = await res.json();
+      const newPosts = data.posts || [];
+
+      if (reset) {
+        setPosts(newPosts);
+      } else {
+        setPosts((prev) => [...prev, ...newPosts]);
+      }
+
+      setHasMore(newPosts.length === LIMIT);
+      setOffset(currentOffset + LIMIT);
+    } catch (err) {
+      console.error('Failed to load blog posts:', err);
       setError('Failed to load blog posts. Please try again later.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -464,6 +497,41 @@ export default function Blog() {
                   </motion.article>
                 );
               })}
+            </div>
+          )}
+
+          {/* Load More */}
+          {!loading && !error && hasMore && filteredPosts.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 48 }}>
+              <button
+                onClick={() => loadPosts()}
+                disabled={loadingMore}
+                style={{
+                  padding: '14px 32px',
+                  borderRadius: 12,
+                  border: '1.5px solid #E5E8F0',
+                  background: '#fff',
+                  color: '#0F172A',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: loadingMore ? 'wait' : 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  opacity: loadingMore ? 0.7 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = '#5B3FD4';
+                  e.target.style.color = '#5B3FD4';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = '#E5E8F0';
+                  e.target.style.color = '#0F172A';
+                }}
+              >
+                {loadingMore ? 'Loading...' : 'Load more articles'}
+              </button>
             </div>
           )}
         </div>
