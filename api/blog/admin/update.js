@@ -41,7 +41,8 @@ export default async function handler(req, res) {
       seo_description,
       og_image_url,
       canonical_url,
-      settings
+      settings,
+      published_at
     } = req.body;
 
     const readMinutes = body ? Math.ceil(body.split(/\s+/).length / 200) : undefined;
@@ -55,9 +56,15 @@ export default async function handler(req, res) {
     if (tags !== undefined) updateData.tags = tags;
     if (featured_image_url !== undefined) updateData.featured_image_url = featured_image_url;
     if (featured_image_alt !== undefined) updateData.featured_image_alt = featured_image_alt;
+    if (published_at !== undefined) updateData.published_at = published_at;
     if (is_published !== undefined) {
       updateData.is_published = is_published;
-      updateData.published_at = is_published ? new Date().toISOString() : null;
+      if (is_published && !updateData.published_at) {
+        // Only auto-set if not already set or being set
+        updateData.published_at = new Date().toISOString();
+      } else if (!is_published) {
+        updateData.published_at = null;
+      }
     }
     if (readMinutes !== undefined) updateData.read_minutes = readMinutes;
     if (seo_title !== undefined) updateData.seo_title = seo_title;

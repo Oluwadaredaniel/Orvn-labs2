@@ -653,24 +653,43 @@ export default function BlogEditor() {
           </div>
 
           {/* Publish Toggle */}
-          <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontWeight: 600, color: '#0F172A' }}>
-                {post.is_published ? '✓ Published' : '○ Draft'}
+          <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontWeight: 600, color: '#0F172A' }}>
+                  {post.is_published ? '✓ Published' : '○ Draft'}
+                </div>
+                <p style={{ fontSize: 13, color: '#94A3B8', margin: '4px 0 0' }}>
+                  {post.is_published ? 'This post is visible to readers' : 'Only you can see this post'}
+                </p>
               </div>
-              <p style={{ fontSize: 13, color: '#94A3B8', margin: '4px 0 0' }}>
-                {post.is_published ? 'This post is visible to readers' : 'Only you can see this post'}
-              </p>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={post.is_published}
+                  onChange={(e) => setPost({ ...post, is_published: e.target.checked })}
+                  style={{ width: 20, height: 20, cursor: 'pointer' }}
+                />
+                <span style={{ fontWeight: 600, color: '#0F172A' }}>Publish Now</span>
+              </label>
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={post.is_published}
-                onChange={(e) => setPost({ ...post, is_published: e.target.checked })}
-                style={{ width: 20, height: 20, cursor: 'pointer' }}
-              />
-              <span style={{ fontWeight: 600, color: '#0F172A' }}>Publish Now</span>
-            </label>
+
+            {post.is_published && (
+              <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 20 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 8, textTransform: 'uppercase' }}>
+                  Publish Date / Schedule
+                </label>
+                <input
+                  type="datetime-local"
+                  value={post.published_at ? new Date(post.published_at).toISOString().slice(0, 16) : ''}
+                  onChange={(e) => setPost({ ...post, published_at: new Date(e.target.value).toISOString() })}
+                  style={{ width: '100%', padding: 12, border: '1px solid #E5E8F0', borderRadius: 8, fontSize: 14 }}
+                />
+                <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 6 }}>
+                  If set in the future, the post will be scheduled.
+                </p>
+              </div>
+            )}
           </div>
         </form>
 

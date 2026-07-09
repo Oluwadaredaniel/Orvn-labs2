@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         .eq('slug', slug);
 
       if (preview !== 'true') {
-        query = query.eq('is_published', true);
+        query = query.eq('is_published', true).lte('published_at', new Date().toISOString());
       }
 
       const { data, error } = await query.single();

@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       .from('blog_posts')
       .select('id, slug, title, excerpt, category, author, featured_image_url, featured_image_alt, read_minutes, published_at')
       .eq('is_published', true)
+      .lte('published_at', new Date().toISOString())
       .order('published_at', { ascending: false });
 
     if (category && category !== 'all') {

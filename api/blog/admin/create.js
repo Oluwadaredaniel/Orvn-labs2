@@ -49,7 +49,8 @@ export default async function handler(req, res) {
       seo_description,
       og_image_url,
       canonical_url,
-      settings
+      settings,
+      published_at
     } = req.body;
 
     // Validation
@@ -75,7 +76,7 @@ export default async function handler(req, res) {
           featured_image_alt: featured_image_alt || '',
           is_published: is_published || false,
           read_minutes: readMinutes,
-          published_at: is_published ? new Date().toISOString() : null,
+          published_at: is_published ? (published_at || new Date().toISOString()) : null,
           seo_title: seo_title || title,
           seo_description: seo_description || excerpt,
           og_image_url: og_image_url || featured_image_url || null,

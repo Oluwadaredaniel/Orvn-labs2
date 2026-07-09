@@ -463,8 +463,147 @@ export default function BlogDashboard() {
                 p.slug.toLowerCase().includes(searchQuery.toLowerCase())
               )
               .map((post) => (
-              /* ... existing post map items ... */
-            ))}
+                <div
+                  key={post.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto',
+                    gap: 16,
+                    padding: '16px 20px',
+                    borderBottom: '1px solid #F1F5F9',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 8, background: '#F1F5F9', overflow: 'hidden', flexShrink: 0 }}>
+                      {post.featured_image_url ? (
+                        <img src={post.featured_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#CBD5E1' }}>
+                          <FileText size={18} />
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {post.title}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}>
+                        /{post.slug}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 14, color: '#475569' }}>
+                    {post.category}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#94A3B8' }}>
+                    {fmt(post.created_at)}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <button
+                      onClick={() => handleTogglePublish(post)}
+                      style={{
+                        background: post.is_published ? (new Date(post.published_at) > new Date() ? '#FFFBEB' : '#ECFDF5') : '#F8FAFC',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: post.is_published ? (new Date(post.published_at) > new Date() ? '#D97706' : '#059669') : '#94A3B8',
+                        padding: '4px 8px',
+                        borderRadius: 6,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 11,
+                        fontWeight: 700,
+                      }}
+                      title={post.is_published ? 'Click to draft' : 'Click to publish'}
+                    >
+                      {post.is_published ? (new Date(post.published_at) > new Date() ? <BookOpen size={12} /> : <Eye size={12} />) : <EyeOff size={12} />}
+                      {post.is_published ? (new Date(post.published_at) > new Date() ? 'SCHEDULED' : 'LIVE') : 'DRAFT'}
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>
+                    {post.views_count || 0}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <a
+                      href={`/blog/${post.slug}${post.is_published ? '' : '?preview=true'}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        background: '#F8FAFC',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        cursor: 'pointer',
+                        color: '#94A3B8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                      }}
+                      title="View on site"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
+                    <button
+                      onClick={() => handleDuplicate(post)}
+                      style={{
+                        background: '#F1F5F9',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        cursor: 'pointer',
+                        color: '#64748B',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                      }}
+                      title="Duplicate"
+                    >
+                      <Copy size={14} />
+                    </button>
+                    <button
+                      onClick={() => navigate(`/admin/blog/edit/${post.slug}`)}
+                      style={{
+                        background: '#EEEAFB',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        cursor: 'pointer',
+                        color: '#5B3FD4',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                      }}
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteModal({ isOpen: true, slug: post.slug, title: post.title })}
+                      style={{
+                        background: '#FEE2E2',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        cursor: 'pointer',
+                        color: '#DC2626',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
 
