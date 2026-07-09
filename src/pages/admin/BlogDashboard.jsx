@@ -318,8 +318,8 @@ export default function BlogDashboard() {
             {[
               { label: 'Total Posts', value: posts.length, icon: <FileText size={20} />, color: '#5B3FD4' },
               { label: 'Published', value: posts.filter(p => p.is_published).length, icon: <CheckCircle size={20} />, color: '#0D9E6E' },
-              { label: 'Drafts', value: posts.filter(p => !p.is_published).length, icon: <BookOpen size={20} />, color: '#94A3B8' },
               { label: 'Total Views', value: posts.reduce((acc, p) => acc + (p.views_count || 0), 0), icon: <BarChart2 size={20} />, color: '#F59E0B' },
+              { label: 'Total Likes', value: posts.reduce((acc, p) => acc + (p.likes_count || 0), 0), icon: <Heart size={20} />, color: '#EF4444' },
             ].map((stat, i) => (
               <div key={i} style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #E5E8F0', display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div style={{ background: `${stat.color}10`, color: stat.color, padding: 12, borderRadius: 10 }}>
