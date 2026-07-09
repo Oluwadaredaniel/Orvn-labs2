@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send, Heart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send, Heart, Twitter, Linkedin } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -289,6 +289,48 @@ export default function BlogPost() {
               {copied ? <Check size={16} /> : <Share2 size={16} />}
               {copied ? 'Link Copied!' : 'Share'}
             </button>
+
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                border: '1.5px solid #E5E8F0',
+                color: '#1DA1F2',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#1DA1F2'; e.currentTarget.style.background = '#F0F9FF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E8F0'; e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Twitter size={18} fill="currentColor" />
+            </a>
+
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                border: '1.5px solid #E5E8F0',
+                color: '#0A66C2',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0A66C2'; e.currentTarget.style.background = '#F0F7FF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E8F0'; e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Linkedin size={18} fill="currentColor" />
+            </a>
           </div>
         </div>
 
@@ -402,28 +444,39 @@ export default function BlogPost() {
           <h2 className="h-section" style={{ fontSize: 'clamp(24px, 3vw, 32px)', margin: '0 0 20px' }}>
             Keep reading
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {related.map((p) => (
-              <article key={p.slug} className="card" style={{ padding: 24 }}>
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 11,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#5B3FD4',
-                    marginBottom: 8,
-                    display: 'inline-block',
-                  }}
-                >
-                  {p.category}
-                </span>
-                <h3 style={{ fontSize: 18, fontWeight: 600, fontFamily: "'Inter', sans-serif", color: '#0F172A', margin: '0 0 8px', lineHeight: 1.35 }}>
-                  <Link to={`/blog/${p.slug}`} style={{ color: '#0F172A' }}>{p.title}</Link>
-                </h3>
-                <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>
-                  {p.excerpt}
-                </p>
+              <article key={p.slug} className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                {p.featured_image_url && (
+                  <Link to={`/blog/${p.slug}`} style={{ display: 'block', height: 160, overflow: 'hidden' }}>
+                    <img src={p.featured_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </Link>
+                )}
+                <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <span
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 10,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: '#5B3FD4',
+                      marginBottom: 8,
+                      display: 'inline-block',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {p.category}
+                  </span>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, fontFamily: "'Inter', sans-serif", color: '#0F172A', margin: '0 0 8px', lineHeight: 1.4 }}>
+                    <Link to={`/blog/${p.slug}`} style={{ color: '#0F172A', textDecoration: 'none' }}>{p.title}</Link>
+                  </h3>
+                  <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.6, margin: '0 0 16px', flex: 1 }}>
+                    {p.excerpt}
+                  </p>
+                  <Link to={`/blog/${p.slug}`} style={{ fontSize: 13, fontWeight: 700, color: '#5B3FD4', textDecoration: 'none' }}>
+                    Read more →
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
