@@ -13,6 +13,9 @@ const fmt = (iso) =>
 
 export default function BlogPost() {
   const { slug } = useParams();
+  const [searchParams] = useState(new URLSearchParams(window.location.search));
+  const isPreview = searchParams.get('preview') === 'true';
+
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
   const [prev, setPrev] = useState(null);
@@ -55,7 +58,7 @@ export default function BlogPost() {
       setLoading(true);
       setNotFound(false);
 
-      const res = await fetch(`/api/blog/post?slug=${slug}`);
+      const res = await fetch(`/api/blog/post?slug=${slug}${isPreview ? '&preview=true' : ''}`);
       if (!res.ok) {
         if (res.status === 404) {
           setNotFound(true);
@@ -139,6 +142,13 @@ export default function BlogPost() {
           transition: 'width 0.1s ease-out',
         }}
       />
+
+      {post.is_published === false && (
+        <div style={{ background: '#F59E0B', color: '#fff', textAlign: 'center', padding: '10px', fontSize: 13, fontWeight: 700, position: 'sticky', top: 0, zIndex: 1000 }}>
+          DRAFT PREVIEW — This post is not yet visible to the public.
+          <Link to={`/admin/blog/edit/${post.slug}`} style={{ color: '#fff', marginLeft: 12, textDecoration: 'underline' }}>Edit post</Link>
+        </div>
+      )}
 
       <article style={{ padding: '0 0 clamp(24px, 3vw, 40px)', background: '#fff' }}>
         {/* Hero Section */}

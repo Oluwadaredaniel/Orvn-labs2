@@ -6,16 +6,20 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { slug } = req.query;
+  const { slug, preview } = req.query;
 
   if (req.method === 'GET') {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('blog_posts')
         .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .single();
+        .eq('slug', slug);
+
+      if (preview !== 'true') {
+        query = query.eq('is_published', true);
+      }
+
+      const { data, error } = await query.single();
 
       if (error && error.code !== 'PGRST116') throw error;
 
