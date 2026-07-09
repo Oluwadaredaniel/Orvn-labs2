@@ -15,6 +15,7 @@ export default function BlogDashboard() {
   const [pendingComments, setPendingComments] = useState(0);
   const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [recentComments, setRecentComments] = useState([]);
+  const [categoryStats, setCategoryStats] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Modal State
@@ -50,8 +51,15 @@ export default function BlogDashboard() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPosts(data || []);
+      if (!error) {
+        setPosts(data || []);
+        // Calculate category distribution
+        const dist = data.reduce((acc, p) => {
+          acc[p.category] = (acc[p.category] || 0) + 1;
+          return acc;
+        }, {});
+        setCategoryStats(Object.entries(dist).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count));
+      }
     } catch (err) {
       console.error('Failed to load posts:', err);
       alert('Failed to load posts');
@@ -690,6 +698,32 @@ export default function BlogDashboard() {
                 View all comments
               </button>
             )}
+          </div>
+
+          {/* Category Stats */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, border: '1px solid #E5E8F0' }}>
+             <h3 style={{ margin: '0 0 20px', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+               <Layers size={18} style={{ color: '#5B3FD4' }} /> Categories
+             </h3>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+               {categoryStats.map(cat => (
+                 <div key={cat.name}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
+                     <span style={{ fontWeight: 600, color: '#475569' }}>{cat.name}</span>
+                     <span style={{ color: '#94A3B8' }}>{cat.count} posts</span>
+                   </div>
+                   <div style={{ height: 6, background: '#F1F5F9', borderRadius: 10, overflow: 'hidden' }}>
+                     <div style={{ height: '100%', background: '#5B3FD4', width: `${(cat.count / posts.length) * 100}%` }} />
+                   </div>
+                 </div>
+               ))}
+             </div>
+             <button
+                onClick={() => navigate('/admin/blog/categories')}
+                style={{ width: '100%', marginTop: 20, padding: '10px', background: '#F8FAFC', border: '1px solid #E5E8F0', borderRadius: 8, fontSize: 12, fontWeight: 700, color: '#5B3FD4', cursor: 'pointer' }}
+              >
+                Manage categories
+              </button>
           </div>
         </div>
       </div>
