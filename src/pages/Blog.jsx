@@ -52,6 +52,7 @@ export default function Blog() {
 
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,6 +65,7 @@ export default function Blog() {
 
   useEffect(() => {
     loadCategories();
+    loadTags();
     loadPosts(true);
   }, []);
 
@@ -80,6 +82,18 @@ export default function Blog() {
       }
     } catch (err) {
       console.warn('Failed to load categories:', err);
+    }
+  };
+
+  const loadTags = async () => {
+    try {
+      const res = await fetch('/api/blog/tags');
+      if (res.ok) {
+        const data = await res.json();
+        setTags(data.tags || []);
+      }
+    } catch (err) {
+      console.warn('Failed to load tags:', err);
     }
   };
 
@@ -229,6 +243,41 @@ export default function Blog() {
               </button>
             )}
           </motion.div>
+
+          {/* Popular Tags */}
+          {tags.length > 0 && (
+            <motion.div
+              {...fadeUp(0.05)}
+              style={{
+                display: 'flex',
+                gap: 8,
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                marginBottom: 24,
+              }}
+            >
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', alignSelf: 'center', marginRight: 8 }}>Tags:</span>
+              {tags.slice(0, 10).map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    border: '1px solid #E5E8F0',
+                    background: selectedTag === tag ? '#EEEAFB' : '#fff',
+                    color: selectedTag === tag ? '#5B3FD4' : '#64748B',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </motion.div>
+          )}
 
           {/* Category Filter */}
           <motion.div
