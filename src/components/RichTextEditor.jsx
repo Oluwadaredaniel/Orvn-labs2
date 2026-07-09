@@ -27,6 +27,7 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Youtube,
   Minus,
   Undo2,
   Redo2,
@@ -141,6 +142,27 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
+  };
+
+  const addYoutube = () => {
+    const url = window.prompt('Enter YouTube URL:');
+    if (url) {
+      // Basic YouTube regex to get ID
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      const id = (match && match[2].length === 11) ? match[2] : null;
+
+      if (id) {
+        const iframe = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`;
+        editor.chain().focus().insertContent(iframe).run();
+      } else {
+        alert('Invalid YouTube URL');
+      }
+    }
+  };
+
+  const addDivider = () => {
+    editor.chain().focus().setHorizontalRule().run();
   };
 
   // const insertTable = () => {
@@ -286,6 +308,16 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
           onClick={addImage}
           icon={ImageIcon}
           title="Insert Image"
+        />
+        <MenuButton
+          onClick={addYoutube}
+          icon={Youtube}
+          title="Insert YouTube Video"
+        />
+        <MenuButton
+          onClick={addDivider}
+          icon={Minus}
+          title="Insert Divider"
         />
         {/* <MenuButton
           onClick={insertTable}

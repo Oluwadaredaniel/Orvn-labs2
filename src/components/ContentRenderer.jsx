@@ -240,7 +240,26 @@ export const ContentRendererStyles = `
 .content-renderer hr {
   border: none;
   border-top: 2px solid #E5E8F0;
-  margin: 28px 0;
+  margin: 40px 0;
+}
+
+/* Video Container */
+.content-renderer .video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+  margin: 32px 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.content-renderer .video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Text Alignment */
