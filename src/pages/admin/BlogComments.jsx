@@ -68,6 +68,25 @@ export default function BlogComments() {
     }
   };
 
+  const handleDeleteAllSpams = async () => {
+    if (!window.confirm('Permanently delete ALL spam comments?')) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      // We can iterate or add a bulk delete endpoint. For now, let's just do it sequentially or simple loop.
+      // Better: add support to moderate API for bulk.
+      const spamIds = comments.filter(c => c.status === 'spam').map(c => c.id);
+      for (const id of spamIds) {
+        await fetch(`/api/blog/admin/comments/moderate?id=${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${session?.access_token}` }
+        });
+      }
+      setComments(comments.filter(c => c.status !== 'spam'));
+    } catch (err) {
+      console.error('Bulk delete error:', err);
+    }
+  };
+
   const fmt = (iso) => new Date(iso).toLocaleString();
 
   return (
@@ -82,6 +101,24 @@ export default function BlogComments() {
           </button>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', margin: 0 }}>Comments Moderation</h1>
           <div style={{ display: 'flex', gap: 8 }}>
+            {filter === 'spam' && comments.length > 0 && (
+              <button
+                onClick={handleDeleteAllSpams}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#FEF2F2',
+                  color: '#DC2626',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  marginRight: 12
+                }}
+              >
+                Delete All Spams
+              </button>
+            )}
             {['all', 'pending', 'approved', 'spam'].map(f => (
               <button
                 key={f}
