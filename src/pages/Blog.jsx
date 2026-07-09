@@ -351,6 +351,25 @@ export default function Blog() {
             </div>
           )}
 
+          {(searchQuery || selectedCategory || selectedTag) && !loading && (
+            <div style={{ textAlign: 'center', marginBottom: 32, fontSize: 14, color: '#94A3B8' }}>
+              Showing {filteredPosts.length} {filteredPosts.length === 1 ? 'article' : 'articles'}
+              {searchQuery && <> for "<strong>{searchQuery}</strong>"</>}
+              {selectedCategory && <> in <strong>{selectedCategory}</strong></>}
+              {selectedTag && <> tagged with <strong>#{selectedTag}</strong></>}
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory(null);
+                  setSelectedTag(null);
+                }}
+                style={{ marginLeft: 12, color: '#5B3FD4', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
           {/* Loading State */}
           {loading ? (
             <BlogSkeleton />
