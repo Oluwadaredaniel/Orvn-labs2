@@ -1,56 +1,89 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Edit2, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Tag, Info } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import Modal from '../../components/ui/Modal';
 
 export default function BlogCategories() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [editValue, setEditValue] = useState('');
-  const [newCategory, setNewCategory] = useState('');
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   useEffect(() => {
-    loadCategories();
+    fetchCategories();
   }, []);
 
-  const showToast = (message, type = 'success') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: '' }), 3000);
   };
 
-  const loadCategories = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      // We fetch distinct categories from blog_posts table for now
-      // as there is no separate categories table yet.
-      // In a more advanced system, we would have a 'categories' table.
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('category');
-
-      if (error) throw error;
-      const unique = [...new Set(data.map(p => p.category))].filter(Boolean);
-      setCategories(unique.map((name, id) => ({ id, name })));
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/blog/admin/categories', {
+        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data.categories || []);
+      }
     } catch (err) {
-      console.error('Failed to load categories:', err);
+      console.error('Fetch error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAdd = () => {
-    if (!newCategory.trim()) return;
-    if (categories.some(c => c.name === newCategory.trim())) {
-      showToast('Category already exists', 'error');
-      return;
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/blog/admin/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ name, description })
+      });
+
+      if (res.ok) {
+        setName('');
+        setDescription('');
+        fetchCategories();
+        showToast('Category added successfully');
+      }
+    } catch (err) {
+      console.error('Create error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setCategories([...categories, { id: Date.now(), name: newCategory.trim() }]);
-    setNewCategory('');
-    showToast('Category added locally (save post to use)');
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this category?')) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/api/blog/admin/categories?id=${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+      });
+
+      if (res.ok) {
+        setCategories(categories.filter(c => c.id !== id));
+        showToast('Category deleted');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
   };
 
   return (
@@ -61,48 +94,84 @@ export default function BlogCategories() {
             onClick={() => navigate('/admin/blog')}
             style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#5B3FD4', fontWeight: 600 }}
           >
-            <ArrowLeft size={18} /> Back to Dashboard
+            <ArrowLeft size={18} /> Back
           </button>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', margin: 0 }}>Manage Categories</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', margin: 0 }}>Blog Categories</h1>
+          <div style={{ width: 40 }} />
         </div>
       </div>
 
-      <div className="container-page" style={{ maxWidth: 600, paddingBlock: 40 }}>
-        <div style={{ background: '#fff', borderRadius: 12, padding: 24, border: '1px solid #E5E8F0', marginBottom: 24 }}>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 12 }}>
-            Add New Category
-          </label>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <input
-              type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="e.g. Technology"
-              style={{ flex: 1, padding: '12px 14px', border: '1px solid #E5E8F0', borderRadius: 10, outline: 'none' }}
-            />
-            <button
-              onClick={handleAdd}
-              style={{ background: '#5B3FD4', color: '#fff', border: 'none', padding: '0 20px', borderRadius: 10, fontWeight: 600, cursor: 'pointer' }}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-
-        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E8F0', overflow: 'hidden' }}>
-          {categories.map((cat) => (
-            <div key={cat.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F1F5F9' }}>
-              <div style={{ fontWeight: 600, color: '#0F172A' }}>{cat.name}</div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                   onClick={() => setCategories(categories.filter(c => c.id !== cat.id))}
-                   style={{ background: '#FEE2E2', border: 'none', padding: 8, borderRadius: 6, color: '#DC2626', cursor: 'pointer' }}
-                >
-                  <Trash2 size={14} />
-                </button>
+      <div className="container-page" style={{ maxWidth: 800, paddingBlock: 40 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 32, alignItems: 'start' }}>
+          {/* Form */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1px solid #E5E8F0' }}>
+            <h3 style={{ margin: '0 0 20px', fontSize: 18, fontWeight: 800 }}>Create Category</h3>
+            <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Industry News"
+                  style={{ width: '100%', padding: 12, border: '1px solid #E5E8F0', borderRadius: 8, fontSize: 14 }}
+                />
               </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>Description (optional)</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="What is this category about?"
+                  rows={3}
+                  style={{ width: '100%', padding: 12, border: '1px solid #E5E8F0', borderRadius: 8, fontSize: 14, fontFamily: 'inherit' }}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{ background: '#5B3FD4', color: '#fff', border: 'none', padding: 14, borderRadius: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: isSubmitting ? 0.7 : 1 }}
+              >
+                <Plus size={18} /> {isSubmitting ? 'Creating...' : 'Create Category'}
+              </button>
+            </form>
+          </div>
+
+          {/* List */}
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E8F0', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', background: '#F8FAFC', borderBottom: '1px solid #E5E8F0', fontWeight: 700, fontSize: 13, color: '#94A3B8', textTransform: 'uppercase' }}>
+              Existing Categories
             </div>
-          ))}
+            {loading ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#94A3B8' }}>Loading...</div>
+            ) : categories.length === 0 ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#94A3B8' }}>No categories found.</div>
+            ) : (
+              <div>
+                {categories.map((cat) => (
+                  <div key={cat.id} style={{ padding: '16px 20px', borderBottom: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Tag size={14} style={{ color: '#5B3FD4' }} />
+                        <span style={{ fontWeight: 700, color: '#0F172A' }}>{cat.name}</span>
+                      </div>
+                      {cat.description && (
+                        <p style={{ margin: 0, fontSize: 13, color: '#64748B', lineHeight: 1.4 }}>{cat.description}</p>
+                      )}
+                      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4, fontFamily: 'monospace' }}>/{cat.slug}</div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(cat.id)}
+                      style={{ background: 'none', border: 'none', padding: 4, color: '#EF4444', cursor: 'pointer' }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

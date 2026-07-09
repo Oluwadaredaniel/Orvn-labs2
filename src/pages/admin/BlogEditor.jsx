@@ -6,27 +6,17 @@ import { supabase } from '../../lib/supabase';
 import RichTextEditor from '../../components/RichTextEditor';
 import ContentRenderer from '../../components/ContentRenderer';
 
-const CATEGORIES = [
-  'First-contact infrastructure',
-  'Lead leakage',
-  'CRM graveyards',
-  'ISA operations',
-  'Agent handoff',
-  'After-hours leads',
-  'Brokerage intelligence',
-  'PAS build notes',
-];
-
 export default function BlogEditor() {
   const navigate = useNavigate();
   const { slug } = useParams();
   const isEditing = !!slug;
 
+  const [categories, setCategories] = useState([]);
   const [post, setPost] = useState({
     title: '',
     excerpt: '',
     body: '',
-    category: CATEGORIES[0],
+    category: '',
     author: '',
     tags: [],
     featured_image_url: '',
@@ -45,7 +35,7 @@ export default function BlogEditor() {
     },
   });
 
-  const [loading, setLoading] = useState(isEditing);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [authors, setAuthors] = useState([]);
@@ -62,8 +52,11 @@ export default function BlogEditor() {
   useEffect(() => {
     checkAuth();
     loadAuthors();
+    loadCategories();
     if (isEditing) {
       loadPost();
+    } else {
+      setLoading(false);
     }
   }, [slug]);
 
@@ -85,6 +78,22 @@ export default function BlogEditor() {
       }
     } catch (err) {
       console.warn('Failed to load authors:', err);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const res = await fetch('/api/blog/categories');
+      if (res.ok) {
+        const data = await res.json();
+        const cats = data.categories || [];
+        setCategories(cats);
+        if (!isEditing && cats.length > 0) {
+          setPost(prev => ({ ...prev, category: cats[0] }));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load categories:', err);
     }
   };
 
@@ -388,7 +397,7 @@ export default function BlogEditor() {
                     boxSizing: 'border-box',
                   }}
                 >
-                  {CATEGORIES.map((cat) => (
+                  {categories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>

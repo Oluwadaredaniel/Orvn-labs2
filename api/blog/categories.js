@@ -13,17 +13,15 @@ export default async function handler(req, res) {
 
   try {
     const { data, error } = await supabase
-      .from('blog_posts')
-      .select('category')
-      .eq('is_published', true);
+      .from('blog_categories')
+      .select('name')
+      .order('name', { ascending: true });
 
     if (error) throw error;
 
-    const categories = Array.from(new Set(data?.map((p) => p.category) || []))
-      .filter(Boolean)
-      .sort();
+    const categories = data?.map((c) => c.name) || [];
 
-    res.setHeader('Cache-Control', 'public, s-maxage=3600');
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
     return res.status(200).json({ categories });
   } catch (err) {
     console.error('[blog/categories]', err);
