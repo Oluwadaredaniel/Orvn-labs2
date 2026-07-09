@@ -20,6 +20,8 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [toc, setToc] = useState([]);
+  const [processedBody, setProcessedBody] = useState('');
   const [copied, setCopied] = useState(false);
   const [comment, setComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -68,6 +70,22 @@ export default function BlogPost() {
       setNext(data.next);
       setLikesCount(data.post.likes_count || 0);
 
+      // Process body and generate TOC
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.post.body, 'text/html');
+      const headings = Array.from(doc.querySelectorAll('h2, h3')).map((h, i) => {
+        const id = `heading-${i}`;
+        h.setAttribute('id', id);
+        h.setAttribute('data-toc-id', id); // for smooth scroll targeting
+        return {
+          id: id,
+          text: h.innerText,
+          level: h.tagName.toLowerCase(),
+        };
+      });
+      setToc(headings);
+      setProcessedBody(doc.body.innerHTML);
+
       // Increment views (fire and forget)
       fetch(`/api/blog/increment-views?slug=${slug}`, { method: 'POST' })
         .catch((err) => console.warn('Failed to increment views:', err));
@@ -82,10 +100,12 @@ export default function BlogPost() {
   useDocumentMeta(
     post
       ? {
-          title: post.title,
-          description: post.excerpt,
+          title: post.seo_title || post.title,
+          description: post.seo_description || post.excerpt,
           path: `/blog/${post.slug}`,
+          image: post.og_image_url || post.featured_image_url,
           type: 'article',
+          canonical: post.canonical_url,
         }
       : { title: 'Post not found' }
   );
@@ -175,6 +195,30 @@ export default function BlogPost() {
 
           <p className="lead" style={{ marginBottom: 24 }}>{post.excerpt}</p>
 
+          {/* Table of Contents */}
+          {toc.length > 1 && (
+            <div style={{ background: '#F8FAFC', borderRadius: 12, padding: 20, marginBottom: 32, border: '1px solid #E2E8F0' }}>
+              <h4 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>In this article</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {toc.map((h, i) => (
+                  <li key={i} style={{ paddingLeft: h.level === 'h3' ? 16 : 0 }}>
+                    <a
+                      href={`#${h.id}`}
+                      style={{ color: '#5B3FD4', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const target = document.querySelector(`[data-toc-id="${h.id}"]`);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
@@ -249,7 +293,7 @@ export default function BlogPost() {
         </div>
 
         <div className="container-page" style={{ maxWidth: 760, paddingBlock: 'clamp(16px, 3vw, 32px)' }}>
-          <ContentRenderer html={post.body} />
+          <ContentRenderer html={processedBody || post.body} />
         </div>
 
         {/* Article Navigation */}

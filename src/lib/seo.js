@@ -30,12 +30,13 @@ const setLink = (rel, href) => {
   el.setAttribute('href', href);
 };
 
-export function useDocumentMeta({ title, description, path, image, type = 'website' } = {}) {
+export function useDocumentMeta({ title, description, path, image, type = 'website', canonical } = {}) {
   useEffect(() => {
     const finalTitle = title ? `${title} — ${SITE.name}` : SITE.defaultTitle;
     const finalDesc = description || SITE.defaultDescription;
     const finalUrl = path ? `${SITE.url}${path}` : SITE.url;
     const finalImage = image || `${SITE.url}/og-default.png`;
+    const finalCanonical = canonical || finalUrl;
 
     document.title = finalTitle;
     setMeta('description', finalDesc);
@@ -49,8 +50,8 @@ export function useDocumentMeta({ title, description, path, image, type = 'websi
     setMeta('twitter:title', finalTitle);
     setMeta('twitter:description', finalDesc);
     setMeta('twitter:image', finalImage);
-    setLink('canonical', finalUrl);
-  }, [title, description, path, image, type]);
+    setLink('canonical', finalCanonical);
+  }, [title, description, path, image, type, canonical]);
 }
 
 export const SITE_INFO = SITE;
