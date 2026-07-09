@@ -51,6 +51,12 @@ export default function BlogEditor() {
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [user, setUser] = useState(null);
+  const [readMinutes, setReadMinutes] = useState(0);
+
+  useEffect(() => {
+    const words = post.body.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    setReadMinutes(Math.ceil(words / 200));
+  }, [post.body]);
 
   useEffect(() => {
     checkAuth();
@@ -385,6 +391,18 @@ export default function BlogEditor() {
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
+              </div>
+
+              <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                  Stats
+                </label>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>
+                  ~ {readMinutes} min read
+                </div>
+                <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 4 }}>
+                  {post.body.replace(/<[^>]*>/g, '').length} characters
+                </div>
               </div>
 
               <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
