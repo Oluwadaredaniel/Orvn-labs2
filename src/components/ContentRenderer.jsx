@@ -1,10 +1,51 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 /**
  * Renders HTML content from TipTap editor with proper styling
  * Applies blog-friendly styles to all HTML elements
  */
 export default function ContentRenderer({ html }) {
+  useEffect(() => {
+    // Add copy buttons to pre tags
+    const preBlocks = document.querySelectorAll('.content-renderer pre');
+    preBlocks.forEach((pre) => {
+      if (pre.querySelector('.copy-code-btn')) return;
+
+      const btn = document.createElement('button');
+      btn.className = 'copy-code-btn';
+      btn.innerHTML = 'Copy';
+      btn.style.cssText = `
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s;
+        backdrop-filter: blur(4px);
+      `;
+
+      pre.style.position = 'relative';
+      pre.appendChild(btn);
+
+      pre.addEventListener('mouseenter', () => (btn.style.opacity = '1'));
+      pre.addEventListener('mouseleave', () => (btn.style.opacity = '0'));
+
+      btn.addEventListener('click', () => {
+        const code = pre.querySelector('code')?.innerText || pre.innerText;
+        navigator.clipboard.writeText(code);
+        btn.innerHTML = 'Copied!';
+        setTimeout(() => (btn.innerHTML = 'Copy'), 2000);
+      });
+    });
+  }, [html]);
+
   if (!html) {
     return <div style={{ color: '#94A3B8' }}>No content available.</div>;
   }
