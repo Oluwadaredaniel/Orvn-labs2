@@ -169,10 +169,20 @@ const TblRow = ({ cols, header }) => (
 
 export default function RevenueCalculator() {
   useDocumentMeta({
-    title: 'Revenue Calculator',
-    description:
-      'Conservative estimate of the annual revenue a real estate brokerage could recover with faster, more consistent first contact. Math shown step by step.',
+    title: 'Real Estate Revenue Recovery Calculator',
+    description: 'Estimate the annual revenue your brokerage could recover by improving first-contact consistency and speed-to-lead. Model your close-rate lift and database reactivation potential.',
     path: '/calculators/revenue',
+    schema: {
+      '@type': 'SoftwareApplication',
+      'name': 'Real Estate Revenue Recovery Calculator',
+      'operatingSystem': 'Web',
+      'applicationCategory': 'FinanceApplication',
+      'offers': {
+        '@type': 'Offer',
+        'price': '0',
+        'priceCurrency': 'USD'
+      }
+    }
   });
 
   const [searchParams] = useSearchParams();

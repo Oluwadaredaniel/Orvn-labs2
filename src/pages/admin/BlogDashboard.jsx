@@ -16,6 +16,7 @@ export default function BlogDashboard() {
   const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [recentComments, setRecentComments] = useState([]);
   const [categoryStats, setCategoryStats] = useState([]);
+  const [topPosts, setTopPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Modal State
@@ -59,6 +60,9 @@ export default function BlogDashboard() {
           return acc;
         }, {});
         setCategoryStats(Object.entries(dist).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count));
+
+        // Top Posts
+        setTopPosts([...data].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 5));
       }
     } catch (err) {
       console.error('Failed to load posts:', err);
@@ -724,6 +728,28 @@ export default function BlogDashboard() {
               >
                 Manage categories
               </button>
+          </div>
+
+          {/* Top Posts */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, border: '1px solid #E5E8F0' }}>
+            <h3 style={{ margin: '0 0 20px', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <BarChart2 size={18} style={{ color: '#F59E0B' }} /> Top Performing
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {topPosts.map((p, i) => (
+                <div key={p.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ width: 24, height: 24, borderRadius: 6, background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#94A3B8' }}>
+                    {i + 1}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {p.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#94A3B8' }}>{p.views_count || 0} views</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

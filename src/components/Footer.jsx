@@ -25,8 +25,7 @@ const COLS = [
   {
     title: 'Insights',
     links: [
-      // { label: 'Thesis & Insights', to: '/thesis' },
-      // { label: 'First-Contact Intelligence (Blog)', to: '/thesis' },
+      { label: 'First-Contact Intelligence (Blog)', to: '/blog' },
       { label: 'FAQ', to: '/faq' },
     ],
   },

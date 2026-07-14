@@ -185,6 +185,19 @@ export default function BlogPost() {
           image: post.og_image_url || post.featured_image_url,
           type: 'article',
           canonical: post.canonical_url,
+          schema: {
+            '@type': 'BlogPosting',
+            'headline': post.title,
+            'image': [post.featured_image_url],
+            'datePublished': post.published_at,
+            'dateModified': post.updated_at || post.published_at,
+            'author': [{
+              '@type': 'Person',
+              'name': author?.name || post.author || 'ORVN Labs',
+              'url': author?.website_url || 'https://orvnlabs.com'
+            }],
+            'description': post.excerpt
+          }
         }
       : { title: 'Post not found' }
   );
@@ -233,6 +246,7 @@ export default function BlogPost() {
             <img
               src={post.featured_image_url}
               alt={post.featured_image_alt || post.title}
+              fetchpriority="high"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.6), transparent)' }} />
@@ -603,7 +617,7 @@ export default function BlogPost() {
               <article key={p.slug} className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 {p.featured_image_url && (
                   <Link to={`/blog/${p.slug}`} style={{ display: 'block', height: 160, overflow: 'hidden' }}>
-                    <img src={p.featured_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={p.featured_image_url} alt={p.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </Link>
                 )}
                 <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>

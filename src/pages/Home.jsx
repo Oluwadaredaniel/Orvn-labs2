@@ -1266,7 +1266,21 @@ function RecentBlogsSection() {
 
 // ─── HOME ────────────────────────────────────────────────────────────────────
 export default function Home() {
-  useDocumentMeta({ path: '/' });
+  useDocumentMeta({
+    title: 'Control the First-Contact Layer — AI Infrastructure for Brokerages',
+    description: 'ORVN Labs builds brokerage intelligence infrastructure. PAS answers, qualifies, routes, and books inbound leads before human delay kills your conversion rate.',
+    path: '/',
+    schema: {
+      '@type': 'WebSite',
+      'name': 'ORVN Labs',
+      'description': 'Real estate brokerage infrastructure for lead conversion.',
+      'potentialAction': {
+        '@type': 'SearchAction',
+        'target': 'https://orvnlabs.com/blog?q={search_term_string}',
+        'query-input': 'required name=search_term_string'
+      }
+    }
+  });
   return (
     <PageWrapper>
       <Hero />

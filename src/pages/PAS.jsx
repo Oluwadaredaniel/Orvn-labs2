@@ -807,6 +807,7 @@ function Screenshot({ src, title, caption, delay }) {
           <img
             src={src}
             alt={title}
+            loading="lazy"
             onError={() => setErrored(true)}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
@@ -1329,9 +1330,19 @@ function OperationalVisibility() {
 
 export default function PAS() {
   useDocumentMeta({
-    title: 'PAS — First-Contact Infrastructure',
-    description: 'Detailed systems, workflows, and capabilities of the Performative AI Superstaff.',
+    title: 'PAS — Performative AI Superstaff for Real Estate Brokerages',
+    description: 'Explore PAS, the operating layer that controls the gap between inquiry and qualified appointment. Automate lead qualification, routing, and booking with high-fidelity state tracking.',
     path: '/pas',
+    schema: {
+      '@type': 'Service',
+      'name': 'Performative AI Superstaff (PAS)',
+      'serviceType': 'Real Estate Lead Management Infrastructure',
+      'provider': {
+        '@type': 'Organization',
+        'name': 'ORVN Labs'
+      },
+      'description': 'AI infrastructure that answers, qualifies, routes, and books inbound leads for real estate brokerages.'
+    }
   });
 
   return (

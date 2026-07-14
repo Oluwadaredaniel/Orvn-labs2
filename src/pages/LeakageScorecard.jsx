@@ -207,10 +207,20 @@ function RiskBadge({ risk }) {
 // ─── Page ───────────────────────────────────────────────────────────
 export default function LeakageScorecard() {
   useDocumentMeta({
-    title: 'Lead Leakage Scorecard',
-    description:
-      'A five-minute diagnostic of where your real estate brokerage is leaking inbound leads. Identifies the likely bottleneck and the most direct fix.',
+    title: 'Lead Leakage Scorecard — Diagnostic Tool for Brokerages',
+    description: 'A five-minute diagnostic of where your real estate brokerage is leaking inbound leads. Identify bottlenecks in response time, contact rate, and qualification depth.',
     path: '/calculators/leakage',
+    schema: {
+      '@type': 'SoftwareApplication',
+      'name': 'Lead Leakage Scorecard',
+      'operatingSystem': 'Web',
+      'applicationCategory': 'BusinessApplication',
+      'offers': {
+        '@type': 'Offer',
+        'price': '0',
+        'priceCurrency': 'USD'
+      }
+    }
   });
 
   const [searchParams] = useSearchParams();

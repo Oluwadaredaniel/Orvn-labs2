@@ -30,7 +30,19 @@ const setLink = (rel, href) => {
   el.setAttribute('href', href);
 };
 
-export function useDocumentMeta({ title, description, path, image, type = 'website', canonical } = {}) {
+const setJsonLd = (data) => {
+  let el = document.head.querySelector('script[type="application/ld+json"]');
+  if (el) {
+    el.textContent = JSON.stringify(data);
+  } else {
+    el = document.createElement('script');
+    el.setAttribute('type', 'application/ld+json');
+    el.textContent = JSON.stringify(data);
+    document.head.appendChild(el);
+  }
+};
+
+export function useDocumentMeta({ title, description, path, image, type = 'website', canonical, schema } = {}) {
   useEffect(() => {
     const finalTitle = title ? `${title} — ${SITE.name}` : SITE.defaultTitle;
     const finalDesc = description || SITE.defaultDescription;
@@ -51,7 +63,26 @@ export function useDocumentMeta({ title, description, path, image, type = 'websi
     setMeta('twitter:description', finalDesc);
     setMeta('twitter:image', finalImage);
     setLink('canonical', finalCanonical);
-  }, [title, description, path, image, type, canonical]);
+
+    // Default global schema
+    const defaultSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: SITE.name,
+      url: SITE.url,
+      logo: `${SITE.url}/logo.png`,
+      sameAs: [
+        'https://twitter.com/orvnlabs',
+        'https://linkedin.com/company/orvnlabs'
+      ]
+    };
+
+    if (schema) {
+      setJsonLd({ ...defaultSchema, ...schema });
+    } else {
+      setJsonLd(defaultSchema);
+    }
+  }, [title, description, path, image, type, canonical, schema]);
 }
 
 export const SITE_INFO = SITE;

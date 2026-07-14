@@ -1,23 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://orvnlabs.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://orvnlabs.com/pas</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://orvnlabs.com/pricing</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://orvnlabs.com/calculators</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://orvnlabs.com/calculators/leakage</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://orvnlabs.com/calculators/revenue</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://orvnlabs.com/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://orvnlabs.com/blog/why-real-estate-leads-go-cold</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/blog/first-contact-audit</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/blog/contacted-is-dirty-data</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/blog/speed-to-lead-is-a-conversion-event</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/blog/after-hours-cost</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/demo</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://orvnlabs.com/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://orvnlabs.com/legal/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://orvnlabs.com/legal/ai-disclosure</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://orvnlabs.com/legal/data-retention</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://orvnlabs.com/legal/acceptable-use</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://orvnlabs.com/legal/fair-housing</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <!-- Core Pages -->
+  <url>
+    <loc>https://orvnlabs.com/</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/pas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Calculators -->
+  <url>
+    <loc>https://orvnlabs.com/calculators/leakage</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/calculators/revenue</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog -->
+  <url>
+    <loc>https://orvnlabs.com/blog</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Legal -->
+  <url>
+    <loc>https://orvnlabs.com/legal/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/legal/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/legal/ai-disclosure</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://orvnlabs.com/legal/fair-housing</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
 </urlset>

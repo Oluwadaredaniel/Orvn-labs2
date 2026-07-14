@@ -43,6 +43,25 @@ export default function BlogEditor() {
   const [imagePreview, setImagePreview] = useState('');
   const [user, setUser] = useState(null);
   const [readMinutes, setReadMinutes] = useState(0);
+  const [lastSaved, setLastSaved] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (post.title || post.body) {
+        localStorage.setItem(`blog_draft_${slug || 'new'}`, JSON.stringify(post));
+        setLastSaved(new Date());
+      }
+    }, 5000); // Auto-save to localStorage every 5 seconds
+    return () => clearTimeout(timer);
+  }, [post, slug]);
+
+  const restoreDraft = () => {
+    const saved = localStorage.getItem(`blog_draft_${slug || 'new'}`);
+    if (saved) {
+      setPost(JSON.parse(saved));
+      alert('Draft restored from local storage.');
+    }
+  };
 
   useEffect(() => {
     const words = post.body.replace(/<[^>]*>/g, '').split(/\s+/).length;
@@ -239,6 +258,12 @@ export default function BlogEditor() {
             <ArrowLeft size={18} /> Back
           </button>
           <div style={{ display: 'flex', gap: 12 }}>
+            {lastSaved && (
+               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#94A3B8', marginRight: 12 }}>
+                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
+                 Draft saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+               </div>
+            )}
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}

@@ -45,9 +45,18 @@ const BlogSkeleton = () => (
 
 export default function Blog() {
   useDocumentMeta({
-    title: 'Blog',
-    description: 'Field notes on first-contact infrastructure, lead conversion, and brokerage operations.',
+    title: 'First-Contact Intelligence Blog — Insights for Brokerage Operators',
+    description: 'Weekly field notes on first-contact infrastructure, lead conversion, and brokerage operations. Learn how to recover lost revenue from your inbound pipeline.',
     path: '/blog',
+    schema: {
+      '@type': 'Blog',
+      'name': 'First-Contact Intelligence',
+      'description': 'Insights for real estate brokerage owners and operators on lead conversion and AI infrastructure.',
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'ORVN Labs'
+      }
+    }
   });
 
   const [posts, setPosts] = useState([]);
@@ -456,6 +465,7 @@ export default function Blog() {
                         <img
                           src={post.featured_image_url}
                           alt={post.featured_image_alt || post.title}
+                          loading={isFeatured ? "eager" : "lazy"}
                           style={{
                             width: '100%',
                             height: '100%',

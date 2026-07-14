@@ -90,12 +90,12 @@ export default function Navbar() {
           </Link>
 
           <nav
-            aria-label="Primary"
+            aria-label="Main Navigation"
             style={{ display: 'none', alignItems: 'center', gap: 4 }}
             className="nav-desktop"
           >
             {NAV_LINKS.map((link) => (
-              <NavLink key={link.to} to={link.to} style={linkStyle}>
+              <NavLink key={link.to} to={link.to} style={linkStyle} aria-label={`Navigate to ${link.label}`}>
                 {link.label}
               </NavLink>
             ))}

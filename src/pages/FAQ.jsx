@@ -190,10 +190,20 @@ function Item({ q, a, defaultOpen, delay }) {
 
 export default function FAQ() {
   useDocumentMeta({
-    title: 'FAQ',
-    description:
-      'Common questions about PAS — what it is, what it controls, pricing, data handling, integrations, and Fair Housing compliance.',
+    title: 'Frequently Asked Questions — PAS & ORVN Labs',
+    description: 'Common questions about PAS AI infrastructure, brokerage lead conversion, pricing, data security, and Fair Housing compliance.',
     path: '/faq',
+    schema: {
+      '@type': 'FAQPage',
+      'mainEntity': FAQS.map(f => ({
+        '@type': 'Question',
+        'name': f.q,
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': typeof f.a === 'string' ? f.a : 'See FAQ page for details.'
+        }
+      }))
+    }
   });
 
   return (
