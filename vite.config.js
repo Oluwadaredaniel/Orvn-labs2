@@ -15,7 +15,6 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 600,
     cssCodeSplit: true,
-    minify: 'terser',
   },
   server: {
     proxy: {
