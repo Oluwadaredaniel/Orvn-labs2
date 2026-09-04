@@ -27,3 +27,5 @@ dist-ssr
 # Documentation
 *.md
 !README.md
+.vercel
+.env*

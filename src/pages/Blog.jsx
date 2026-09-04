@@ -8,6 +8,7 @@ import Section from '../components/ui/Section';
 import Eyebrow from '../components/ui/Eyebrow';
 import Newsletter from '../components/Newsletter';
 import { useDocumentMeta } from '../lib/seo';
+import { supabase, getAllCategories } from '../lib/supabase';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
@@ -23,13 +24,13 @@ const BlogSkeleton = () => (
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, width: '100%' }}>
     {[1, 2, 3].map((i) => (
       <div key={i} className="card" style={{ padding: 0, height: 440, overflow: 'hidden' }}>
-        <div style={{ height: 200, background: '#F1F5F9', animation: 'pulse 1.5s infinite' }} />
+        <div style={{ height: 200, background: 'var(--line-strong)', animation: 'pulse 1.5s infinite' }} />
         <div style={{ padding: 24 }}>
-          <div style={{ height: 12, width: '30%', background: '#F1F5F9', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
-          <div style={{ height: 24, width: '80%', background: '#F1F5F9', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
-          <div style={{ height: 16, width: '100%', background: '#F1F5F9', marginBottom: 8, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
-          <div style={{ height: 16, width: '90%', background: '#F1F5F9', marginBottom: 24, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
-          <div style={{ height: 12, width: '50%', background: '#F1F5F9', borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 12, width: '30%', background: 'var(--line-strong)', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 24, width: '80%', background: 'var(--line-strong)', marginBottom: 12, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 16, width: '100%', background: 'var(--line-strong)', marginBottom: 8, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 16, width: '90%', background: 'var(--line-strong)', marginBottom: 24, borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+          <div style={{ height: 12, width: '50%', background: 'var(--line-strong)', borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
         </div>
       </div>
     ))}
@@ -84,11 +85,8 @@ export default function Blog() {
 
   const loadCategories = async () => {
     try {
-      const res = await fetch('/api/blog/categories');
-      if (res.ok) {
-        const data = await res.json();
-        setCategories(data.categories || []);
-      }
+      const cats = await getAllCategories();
+      setCategories(cats);
     } catch (err) {
       console.warn('Failed to load categories:', err);
     }
@@ -96,11 +94,15 @@ export default function Blog() {
 
   const loadTags = async () => {
     try {
-      const res = await fetch('/api/blog/tags');
-      if (res.ok) {
-        const data = await res.json();
-        setTags(data.tags || []);
-      }
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('tags')
+        .eq('is_published', true);
+
+      if (error) throw error;
+
+      const allTags = [...new Set((data || []).flatMap((p) => p.tags || []))];
+      setTags(allTags.sort());
     } catch (err) {
       console.warn('Failed to load tags:', err);
     }
@@ -117,13 +119,23 @@ export default function Blog() {
 
       setError('');
       const currentOffset = reset ? 0 : offset;
-      const categoryQuery = selectedCategory ? `&category=${selectedCategory}` : '';
 
-      const res = await fetch(`/api/blog/list?limit=${LIMIT}&offset=${currentOffset}${categoryQuery}`);
-      if (!res.ok) throw new Error('Failed to load posts');
+      let query = supabase
+        .from('blog_posts')
+        .select('id, slug, title, excerpt, category, author, featured_image_url, featured_image_alt, read_minutes, published_at')
+        .eq('is_published', true)
+        .lte('published_at', new Date().toISOString())
+        .order('published_at', { ascending: false })
+        .range(currentOffset, currentOffset + LIMIT - 1);
 
-      const data = await res.json();
-      const newPosts = data.posts || [];
+      if (selectedCategory && selectedCategory !== 'all') {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const newPosts = data || [];
 
       if (reset) {
         setPosts(newPosts);
@@ -159,23 +171,17 @@ export default function Blog() {
           </motion.div>
           <motion.h1
             {...fadeUp(0.05)}
-            className="h-display"
+            className="h-display-2"
             style={{
-              fontSize: 'clamp(44px, 5.8vw, 76px)',
-              lineHeight: 1.1,
               marginBottom: 24,
-              fontWeight: 800,
             }}
           >
             Field notes on first-contact infrastructure.
           </motion.h1>
           <motion.p
             {...fadeUp(0.1)}
-            className="lead"
+            className="lead-2"
             style={{
-              fontSize: 'clamp(17px, 1.8vw, 19px)',
-              lineHeight: 1.65,
-              color: '#475569',
               maxWidth: 660,
             }}
           >
@@ -201,7 +207,7 @@ export default function Blog() {
                 left: 16,
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#94A3B8',
+                color: 'var(--ink-dim)',
                 display: 'flex',
                 alignItems: 'center',
                 pointerEvents: 'none',
@@ -218,15 +224,15 @@ export default function Blog() {
                 width: '100%',
                 padding: '14px 16px 14px 44px',
                 borderRadius: 14,
-                border: '1.5px solid #E5E8F0',
+                border: '1.5px solid var(--line)',
                 fontSize: 15,
                 outline: 'none',
                 transition: 'all 0.2s',
                 fontFamily: 'inherit',
                 boxSizing: 'border-box',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#5B3FD4')}
-              onBlur={(e) => (e.target.style.borderColor = '#E5E8F0')}
+              onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+              onBlur={(e) => (e.target.style.borderColor = 'var(--line)')}
             />
             {searchQuery && (
               <button
@@ -236,7 +242,7 @@ export default function Blog() {
                   right: 12,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: '#F1F5F9',
+                  background: 'var(--line-strong)',
                   border: 'none',
                   borderRadius: 100,
                   width: 24,
@@ -245,7 +251,7 @@ export default function Blog() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#64748B',
+                  color: 'var(--ink-mid)',
                 }}
               >
                 <X size={14} />
@@ -265,7 +271,7 @@ export default function Blog() {
                 marginBottom: 24,
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', alignSelf: 'center', marginRight: 8 }}>Tags:</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-dim)', textTransform: 'uppercase', alignSelf: 'center', marginRight: 8 }}>Tags:</span>
               {tags.slice(0, 10).map(tag => (
                 <button
                   key={tag}
@@ -273,9 +279,9 @@ export default function Blog() {
                   style={{
                     padding: '4px 10px',
                     borderRadius: 6,
-                    border: '1px solid #E5E8F0',
-                    background: selectedTag === tag ? '#EEEAFB' : '#fff',
-                    color: selectedTag === tag ? '#5B3FD4' : '#64748B',
+                    border: '1px solid var(--line)',
+                    background: selectedTag === tag ? 'var(--primary-pale)' : '#fff',
+                    color: selectedTag === tag ? 'var(--primary)' : 'var(--ink-mid)',
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -304,9 +310,9 @@ export default function Blog() {
               style={{
                 padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 20px)',
                 borderRadius: 100,
-                border: selectedCategory === null ? 'none' : '1.5px solid #E5E8F0',
-                background: selectedCategory === null ? '#5B3FD4' : '#fff',
-                color: selectedCategory === null ? '#fff' : '#475569',
+                border: selectedCategory === null ? 'none' : '1.5px solid var(--line)',
+                background: selectedCategory === null ? 'var(--primary)' : '#fff',
+                color: selectedCategory === null ? '#fff' : 'var(--ink-mid)',
                 fontSize: 'clamp(12px, 1.2vw, 14px)',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -322,9 +328,9 @@ export default function Blog() {
                 style={{
                   padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 20px)',
                   borderRadius: 100,
-                  border: selectedCategory === cat ? 'none' : '1.5px solid #E5E8F0',
-                  background: selectedCategory === cat ? '#5B3FD4' : '#fff',
-                  color: selectedCategory === cat ? '#fff' : '#475569',
+                  border: selectedCategory === cat ? 'none' : '1.5px solid var(--line)',
+                  background: selectedCategory === cat ? 'var(--primary)' : '#fff',
+                  color: selectedCategory === cat ? '#fff' : 'var(--ink-mid)',
                   fontSize: 'clamp(12px, 1.2vw, 14px)',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -339,12 +345,12 @@ export default function Blog() {
           {selectedTag && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
               <div style={{
-                background: '#F1F5F9',
+                background: 'var(--line-strong)',
                 padding: '6px 12px',
                 borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 600,
-                color: '#475569',
+                color: 'var(--ink-mid)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8
@@ -352,7 +358,7 @@ export default function Blog() {
                 Filtered by tag: <strong>#{selectedTag}</strong>
                 <button
                   onClick={() => setSelectedTag(null)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, fontSize: 18 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-dim)', padding: 0, fontSize: 18 }}
                 >
                   ×
                 </button>
@@ -361,7 +367,7 @@ export default function Blog() {
           )}
 
           {(searchQuery || selectedCategory || selectedTag) && !loading && (
-            <div style={{ textAlign: 'center', marginBottom: 32, fontSize: 14, color: '#94A3B8' }}>
+            <div style={{ textAlign: 'center', marginBottom: 32, fontSize: 14, color: 'var(--ink-dim)' }}>
               Showing {filteredPosts.length} {filteredPosts.length === 1 ? 'article' : 'articles'}
               {searchQuery && <> for "<strong>{searchQuery}</strong>"</>}
               {selectedCategory && <> in <strong>{selectedCategory}</strong></>}
@@ -372,7 +378,7 @@ export default function Blog() {
                   setSelectedCategory(null);
                   setSelectedTag(null);
                 }}
-                style={{ marginLeft: 12, color: '#5B3FD4', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                style={{ marginLeft: 12, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
               >
                 Clear all
               </button>
@@ -383,14 +389,14 @@ export default function Blog() {
           {loading ? (
             <BlogSkeleton />
           ) : error ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#DC2626' }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--risk)' }}>
               <p>{error}</p>
               <button
                 onClick={loadPostsAndCategories}
                 style={{
                   marginTop: 16,
                   padding: '10px 20px',
-                  background: '#5B3FD4',
+                  background: 'var(--primary)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 8,
@@ -404,13 +410,13 @@ export default function Blog() {
           ) : filteredPosts.length === 0 ? (
             <motion.div
               {...fadeUp(0)}
-              style={{ textAlign: 'center', padding: '80px 20px', background: '#F8FAFC', borderRadius: 20 }}
+              style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--surface)', borderRadius: 20 }}
             >
               <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', marginBottom: 8 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)', marginBottom: 8 }}>
                 No posts found
               </h3>
-              <p style={{ fontSize: 16, color: '#64748B', maxWidth: 400, margin: '0 auto 24px' }}>
+              <p style={{ fontSize: 16, color: 'var(--ink-mid)', maxWidth: 400, margin: '0 auto 24px' }}>
                 We couldn't find any articles matching "<strong>{searchQuery}</strong>"{selectedCategory ? ` in ${selectedCategory}` : ''}.
               </p>
               <button
@@ -420,7 +426,7 @@ export default function Blog() {
                 }}
                 style={{
                   padding: '12px 24px',
-                  background: '#5B3FD4',
+                  background: 'var(--primary)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 10,
@@ -487,17 +493,17 @@ export default function Blog() {
                     }}>
                       <span
                         style={{
-                          fontFamily: "'JetBrains Mono', monospace",
+                          fontFamily: 'var(--font-mono)',
                           fontSize: 10,
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
-                          color: '#5B3FD4',
+                          color: 'var(--primary)',
                           marginBottom: 12,
                           display: 'inline-block',
                           fontWeight: 600,
                         }}
                       >
-                        {isFeatured && <span style={{ marginRight: 8, background: '#5B3FD4', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>Featured</span>}
+                        {isFeatured && <span style={{ marginRight: 8, background: 'var(--primary)', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>Featured</span>}
                         {post.category}
                       </span>
                       <Link
@@ -505,7 +511,7 @@ export default function Blog() {
                         style={{
                           fontSize: isFeatured ? 'clamp(24px, 3.5vw, 36px)' : 'clamp(18px, 2.2vw, 22px)',
                           fontWeight: 800,
-                          color: '#0F172A',
+                          color: 'var(--ink)',
                           margin: '0 0 12px',
                           lineHeight: 1.2,
                           textDecoration: 'none',
@@ -515,14 +521,14 @@ export default function Blog() {
                       </Link>
                       <p style={{
                         fontSize: isFeatured ? 16 : 14.5,
-                        color: '#475569',
+                        color: 'var(--ink-mid)',
                         lineHeight: 1.6,
                         margin: '0 0 24px',
                         flex: isFeatured ? 'none' : 1
                       }}>
                         {post.excerpt}
                       </p>
-                      <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#94A3B8', marginBottom: 24 }}>
+                      <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--ink-dim)', marginBottom: 24 }}>
                         <span>{fmt(post.published_at)}</span>
                         <span>·</span>
                         <span>{post.read_minutes} min read</span>
@@ -541,13 +547,13 @@ export default function Blog() {
                                 window.scrollTo({ top: 400, behavior: 'smooth' });
                               }}
                               style={{
-                                background: '#F8FAFC',
-                                border: '1px solid #E2E8F0',
+                                background: 'var(--surface)',
+                                border: '1px solid var(--line)',
                                 borderRadius: 4,
                                 padding: '2px 6px',
                                 fontSize: 11,
                                 fontWeight: 600,
-                                color: '#64748B',
+                                color: 'var(--ink-mid)',
                                 cursor: 'pointer'
                               }}
                             >
@@ -563,7 +569,7 @@ export default function Blog() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: 6,
-                          color: '#5B3FD4',
+                          color: 'var(--primary)',
                           fontWeight: 700,
                           fontSize: 14,
                           textDecoration: 'none',
@@ -587,9 +593,9 @@ export default function Blog() {
                 style={{
                   padding: '14px 32px',
                   borderRadius: 12,
-                  border: '1.5px solid #E5E8F0',
+                  border: '1.5px solid var(--line)',
                   background: '#fff',
-                  color: '#0F172A',
+                  color: 'var(--ink)',
                   fontSize: 15,
                   fontWeight: 700,
                   cursor: loadingMore ? 'wait' : 'pointer',
@@ -600,12 +606,12 @@ export default function Blog() {
                   opacity: loadingMore ? 0.7 : 1,
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.borderColor = '#5B3FD4';
-                  e.target.style.color = '#5B3FD4';
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.color = 'var(--primary)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.borderColor = '#E5E8F0';
-                  e.target.style.color = '#0F172A';
+                  e.target.style.borderColor = 'var(--line)';
+                  e.target.style.color = 'var(--ink)';
                 }}
               >
                 {loadingMore ? 'Loading...' : 'Load more articles'}

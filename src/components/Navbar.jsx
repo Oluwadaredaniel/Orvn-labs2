@@ -17,13 +17,13 @@ const NAV_LINKS = [
 const linkStyle = ({ isActive }) => ({
   fontSize: 14,
   fontWeight: 600,
-  color: isActive ? '#5B3FD4' : '#475569',
+  color: isActive ? 'var(--primary)' : 'var(--ink-mid)',
   textDecoration: 'none',
   padding: '8px 14px',
-  borderRadius: 100,
+  borderRadius: 'var(--radius-pill)',
   transition: 'all 0.25s cubic-bezier(0.23, 1, 0.32, 1)',
-  background: isActive ? 'rgba(91, 63, 212, 0.06)' : 'transparent',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
+  background: isActive ? 'var(--primary-glow)' : 'transparent',
+  fontFamily: 'var(--font-body)',
   letterSpacing: '-0.01em',
 });
 
@@ -82,10 +82,11 @@ export default function Navbar() {
                 fontWeight: 800,
                 fontSize: 19,
                 letterSpacing: '-0.02em',
-                color: '#0F172A',
+                fontFamily: 'var(--font-display)',
+                color: 'var(--ink)',
               }}
             >
-              ORVN <span style={{ color: '#5B3FD4' }}>Labs</span>
+              ORVN <span style={{ color: 'var(--primary)' }}>Labs</span>
             </span>
           </Link>
 
@@ -114,7 +115,7 @@ export default function Navbar() {
             <Link
               to="/calculators/leakage"
               className="btn-primary"
-              style={{ padding: '10px 22px', fontSize: 14, borderRadius: 100 }}
+              style={{ padding: '10px 22px', fontSize: 14, borderRadius: 'var(--radius-pill)' }}
             >
               Run leakage score
             </Link>
@@ -132,11 +133,11 @@ export default function Navbar() {
               justifyContent: 'center',
               width: 42,
               height: 42,
-              border: '1.5px solid #E5E8F0',
-              borderRadius: 14,
+              border: '1.5px solid var(--line)',
+              borderRadius: 'var(--radius-md)',
               background: '#fff',
               cursor: 'pointer',
-              color: '#0F172A',
+              color: 'var(--ink)',
               transition: 'all 0.2s',
             }}
           >
@@ -175,7 +176,7 @@ export default function Navbar() {
                 background: 'rgba(255,255,255,0.96)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid #E5E8F0',
+                borderBottom: '1px solid var(--line)',
                 padding: '20px clamp(20px, 5vw, 64px) 28px',
                 boxShadow: '0 16px 40px rgba(15,23,42,0.08)',
               }}
@@ -190,9 +191,9 @@ export default function Navbar() {
                         padding: '16px 0',
                         fontSize: 17,
                         fontWeight: 600,
-                        color: isActive ? '#5B3FD4' : '#0F172A',
+                        color: isActive ? 'var(--primary)' : 'var(--ink)',
                         textDecoration: 'none',
-                        borderBottom: '1px solid #F1F5F9',
+                        borderBottom: '1px solid var(--line-strong)',
                         letterSpacing: '-0.01em',
                       })}
                     >

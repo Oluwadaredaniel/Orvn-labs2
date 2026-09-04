@@ -4,10 +4,13 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. See SUPABASE_SETUP.md');
+  console.error('Missing Supabase env vars. Check your .env file for VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder'
+);
 
 // Helper to get all published posts with sorting
 export async function getPublishedPosts(orderBy = 'published_at', limit = null) {
@@ -17,12 +20,13 @@ export async function getPublishedPosts(orderBy = 'published_at', limit = null) 
     .eq('is_published', true)
     .order(orderBy, { ascending: false });
 
-  if (limit) {
-    query = query.limit(limit);
-  }
+  if (limit) query = query.limit(limit);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
   return data || [];
 }
 
@@ -32,10 +36,14 @@ export async function getPostBySlug(slug) {
     .from('blog_posts')
     .select('*')
     .eq('slug', slug)
+    .eq('is_published', true)
     .single();
 
-  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
-  return data || null;
+  if (error) {
+    console.error('Error fetching post:', error);
+    return null;
+  }
+  return data;
 }
 
 // Helper to get posts by category
@@ -47,12 +55,13 @@ export async function getPostsByCategory(category, limit = null) {
     .eq('category', category)
     .order('published_at', { ascending: false });
 
-  if (limit) {
-    query = query.limit(limit);
-  }
+  if (limit) query = query.limit(limit);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching posts by category:', error);
+    return [];
+  }
   return data || [];
 }
 
@@ -67,7 +76,10 @@ export async function getRelatedPosts(slug, category, limit = 3) {
     .order('published_at', { ascending: false })
     .limit(limit);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching related posts:', error);
+    return [];
+  }
   return data || [];
 }
 
@@ -78,39 +90,47 @@ export async function getAllCategories() {
     .select('category')
     .eq('is_published', true);
 
-  if (error) throw error;
-  const categories = [...new Set(data?.map((p) => p.category) || [])];
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+
+  const categories = [...new Set((data || []).map((p) => p.category))];
   return categories.sort();
 }
 
 // Upload image to storage
 export async function uploadBlogImage(file, subfolder = '') {
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}-${file.name}`;
-  const path = subfolder ? `${subfolder}/${filename}` : filename;
-
+  const path = subfolder ? `${subfolder}/${file.name}` : file.name;
   const { data, error } = await supabase.storage
     .from('blog-images')
-    .upload(path, file, { cacheControl: '3600', upsert: false });
+    .upload(path, file, { upsert: true });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error uploading image:', error);
+    return '';
+  }
 
-  const { data: publicUrl } = supabase.storage
+  const { data: urlData } = supabase.storage
     .from('blog-images')
-    .getPublicUrl(path);
+    .getPublicUrl(data.path);
 
-  return publicUrl.publicUrl;
+  return urlData.publicUrl;
 }
 
 // Delete image from storage
 export async function deleteBlogImage(imageUrl) {
   if (!imageUrl) return;
 
-  const path = imageUrl.split('/blog-images/')[1];
-  if (!path) return;
+  const urlParts = imageUrl.split('/blog-images/');
+  if (urlParts.length < 2) return;
 
+  const filePath = urlParts[1];
   const { error } = await supabase.storage
     .from('blog-images')
-    .remove([path]);
+    .remove([filePath]);
 
-  if (error) console.warn('Failed to delete image:', error);
+  if (error) {
+    console.error('Error deleting image:', error);
+  }
 }

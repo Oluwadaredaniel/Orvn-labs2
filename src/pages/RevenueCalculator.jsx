@@ -8,14 +8,6 @@ import Section from '../components/ui/Section';
 import Eyebrow from '../components/ui/Eyebrow';
 import { useDocumentMeta } from '../lib/seo';
 
-const RED = '#DC2626';
-const AMBER = '#D97706';
-const GREEN = '#0D9E6E';
-const PURPLE = '#5B3FD4';
-const MONO = "'JetBrains Mono', monospace";
-const SANS = "'Inter', sans-serif";
-const DISPLAY = "'Plus Jakarta Sans', sans-serif";
-
 const fm = (n) => {
   const num = Math.round(n);
   if (num >= 1000000) return '$' + (num / 1000000).toFixed(2) + 'M';
@@ -30,11 +22,11 @@ const formatResp = (v) => (v <= 60 ? `${v} min` : `${(v / 60).toFixed(1)} hrs`);
 // response-time→conversion distribution in this repo, so response time is a risk
 // signal only, never a dollar figure.
 const responseBand = (rt) => {
-  if (rt < 5) return { label: 'Target zone', tone: GREEN, bg: '#ECFDF5', border: '#A7F3D0', text: '#065F46' };
-  if (rt <= 15) return { label: 'Early leakage risk', tone: AMBER, bg: '#FFFBEB', border: '#FDE68A', text: '#92400E' };
-  if (rt <= 60) return { label: 'Meaningful delay', tone: AMBER, bg: '#FFFBEB', border: '#FDE68A', text: '#92400E' };
-  if (rt <= 240) return { label: 'High delay', tone: RED, bg: '#FEF2F2', border: '#FECACA', text: '#991B1B' };
-  return { label: 'Severe delay', tone: RED, bg: '#FEF2F2', border: '#FECACA', text: '#991B1B' };
+  if (rt < 5) return { label: 'Target zone', tone: 'var(--ok)', bg: '#ECFDF5', border: '#A7F3D0', text: '#065F46' };
+  if (rt <= 15) return { label: 'Early leakage risk', tone: 'var(--warn)', bg: '#FFFBEB', border: '#FDE68A', text: '#92400E' };
+  if (rt <= 60) return { label: 'Meaningful delay', tone: 'var(--warn)', bg: '#FFFBEB', border: '#FDE68A', text: '#92400E' };
+  if (rt <= 240) return { label: 'High delay', tone: 'var(--risk)', bg: '#FEF2F2', border: '#FECACA', text: '#991B1B' };
+  return { label: 'Severe delay', tone: 'var(--risk)', bg: '#FEF2F2', border: '#FECACA', text: '#991B1B' };
 };
 
 function AnimCounter({ target, prefix = '', suffix = '', duration = 1200 }) {
@@ -66,13 +58,13 @@ const MathRow = ({ label, value, color, bold, border }) => (
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '8px 0',
-      borderBottom: border !== false ? '1px solid #F1F3F9' : 'none',
-      borderTop: bold ? '1px solid #E5E8F0' : 'none',
+      borderBottom: border !== false ? '1px solid var(--line-strong)' : 'none',
+      borderTop: bold ? '1px solid var(--line)' : 'none',
       marginTop: bold ? 4 : 0,
     }}
   >
-    <span style={{ fontSize: 13, color: bold ? '#0F172A' : '#475569', fontWeight: bold ? 600 : 400 }}>{label}</span>
-    <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: bold ? 700 : 500, color: color || (bold ? '#0F172A' : '#475569') }}>
+    <span style={{ fontSize: 13, color: bold ? 'var(--ink)' : 'var(--ink-mid)', fontWeight: bold ? 600 : 400 }}>{label}</span>
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: bold ? 700 : 500, color: color || (bold ? 'var(--ink)' : 'var(--ink-mid)') }}>
       {value}
     </span>
   </div>
@@ -81,7 +73,7 @@ const MathRow = ({ label, value, color, bold, border }) => (
 function AuditPanel({ number, title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
+    <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: 12 }}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -91,11 +83,11 @@ function AuditPanel({ number, title, children, defaultOpen = true }) {
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          background: '#F7F8FB',
+          background: 'var(--surface)',
           border: 'none',
           cursor: 'pointer',
           textAlign: 'left',
-          borderBottom: open ? '1px solid #E5E8F0' : 'none',
+          borderBottom: open ? '1px solid var(--line)' : 'none',
         }}
       >
         <span
@@ -103,12 +95,12 @@ function AuditPanel({ number, title, children, defaultOpen = true }) {
             width: 26,
             height: 26,
             borderRadius: 7,
-            background: PURPLE,
+            background: 'var(--primary)',
             color: '#fff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontFamily: MONO,
+            fontFamily: 'var(--font-mono)',
             fontSize: 11,
             fontWeight: 700,
             flexShrink: 0,
@@ -116,8 +108,8 @@ function AuditPanel({ number, title, children, defaultOpen = true }) {
         >
           {number}
         </span>
-        <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: '#0F172A' }}>{title}</span>
-        {open ? <ChevronUp size={16} color="#94A3B8" /> : <ChevronDown size={16} color="#94A3B8" />}
+        <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{title}</span>
+        {open ? <ChevronUp size={16} color="var(--ink-dim)" /> : <ChevronDown size={16} color="var(--ink-dim)" />}
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -143,8 +135,8 @@ const TblRow = ({ cols, header }) => (
       gridTemplateColumns: 'minmax(140px, 2fr) repeat(3, minmax(80px, 1fr))',
       gap: 8,
       padding: '8px 12px',
-      background: header ? '#F7F8FB' : '#fff',
-      borderBottom: '1px solid #F1F3F9',
+      background: header ? 'var(--surface)' : '#fff',
+      borderBottom: '1px solid var(--line-strong)',
       width: '100%',
       minWidth: 'fit-content',
     }}
@@ -154,8 +146,8 @@ const TblRow = ({ cols, header }) => (
         key={i}
         style={{
           fontSize: header ? 10 : 13,
-          fontFamily: header ? MONO : SANS,
-          color: c.color || (header ? '#94A3B8' : '#475569'),
+          fontFamily: header ? 'var(--font-mono)' : 'var(--font-body)',
+          color: c.color || (header ? 'var(--ink-dim)' : 'var(--ink-mid)'),
           fontWeight: c.bold ? 600 : header ? 500 : 400,
           letterSpacing: header ? '0.1em' : 0,
           textTransform: header ? 'uppercase' : 'none',
@@ -583,20 +575,20 @@ export default function RevenueCalculator() {
           .container-page { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
           #calc-results { display: block !important; border: none !important; padding: 0 !important; }
           .section-y { padding: 0 !important; }
-          .print-header { display: block !important; margin-bottom: 32px; border-bottom: 2px solid #5B3FD4; padding-bottom: 16px; }
-          .card { box-shadow: none !important; border: 1px solid #E5E8F0 !important; }
+          .print-header { display: block !important; margin-bottom: 32px; border-bottom: 2px solid var(--primary); padding-bottom: 16px; }
+          .card { box-shadow: none !important; border: 1px solid var(--line) !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         .print-header { display: none; }
       `}</style>
 
-      <section className="no-print" style={{ padding: 'clamp(48px, 6vw, 80px) 0 clamp(20px, 3vw, 32px)', background: '#fff' }}>
+      <section className="no-print section-y-sm" style={{ background: '#fff' }}>
         <div className="container-page" style={{ maxWidth: 760 }}>
           <Eyebrow>Revenue calculator</Eyebrow>
-          <h1 className="h-display" style={{ fontSize: 'clamp(34px, 5vw, 56px)', margin: '14px 0 16px' }}>
+          <h1 className="h-display-2" style={{ margin: '14px 0 16px' }}>
             How much revenue could faster first contact recover?
           </h1>
-          <p className="lead">
+          <p className="lead-2">
             Every formula shown step by step. Every assumption conservative — this is a floor, not
             a ceiling. The real number is usually higher.
           </p>
@@ -607,28 +599,28 @@ export default function RevenueCalculator() {
         <div
           style={{
             background: '#fff',
-            border: '1px solid #E5E8F0',
-            borderRadius: 16,
+            border: '1px solid var(--line)',
+            borderRadius: 'var(--radius-md)',
             overflow: 'hidden',
-            boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 12px 28px rgba(15,23,42,0.06)',
+            boxShadow: 'var(--shadow-lg)',
           }}
         >
           <div
             style={{
               padding: '18px 28px',
-              borderBottom: '1px solid #F1F3F9',
+              borderBottom: '1px solid var(--line-strong)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: '#F7F8FB',
+              background: 'var(--surface)',
               flexWrap: 'wrap',
               gap: 8,
             }}
           >
-            <span style={{ fontWeight: 600, fontSize: 14, color: '#0F172A' }}>
+            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>
               Recoverable revenue model
             </span>
-            <span style={{ fontFamily: MONO, fontSize: 11, color: '#94A3B8' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink-dim)' }}>
               All inputs editable · runs locally · no signup
             </span>
           </div>
@@ -638,8 +630,8 @@ export default function RevenueCalculator() {
               style={{
                 background: '#FFFBEB',
                 border: '1px solid #FDE68A',
-                borderLeft: '3px solid #D97706',
-                borderRadius: 8,
+                borderLeft: '3px solid var(--warn)',
+                borderRadius: 'var(--radius-sm)',
                 padding: '12px 16px',
                 marginBottom: 24,
                 fontSize: 13.5,
@@ -655,10 +647,10 @@ export default function RevenueCalculator() {
             {/* C1 — How to read this number */}
             <div
               style={{
-                background: '#EEEAFB',
+                background: 'var(--primary-pale)',
                 border: '1px solid #C7BCF5',
-                borderLeft: `3px solid ${PURPLE}`,
-                borderRadius: 8,
+                borderLeft: '3px solid var(--primary)',
+                borderRadius: 'var(--radius-sm)',
                 padding: '14px 16px',
                 marginBottom: 24,
                 fontSize: 13.5,
@@ -670,9 +662,9 @@ export default function RevenueCalculator() {
               your current operation — including how fast you respond today. This calculator does
               not punish that number twice. Instead, it estimates the annual opportunity if faster,
               more consistent first contact lifts your close rate from your current baseline to a
-              target scenario you control. If your target isn’t higher than your current rate, the
+              target scenario you control. If your target isn't higher than your current rate, the
               recoverable opportunity is $0 — and the response-time risk below still applies to the
-              leads you’re currently losing.
+              leads you're currently losing.
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18, marginBottom: 24 }}>
@@ -683,19 +675,9 @@ export default function RevenueCalculator() {
                 { label: 'Total CRM database size', value: crmSize, set: setCrmSize, prefix: null, hint: 'All historical leads ever captured', required: false },
               ].map((f, idx) => (
                 <div key={idx}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontFamily: MONO,
-                      fontSize: 10,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: '#94A3B8',
-                      marginBottom: 8,
-                    }}
-                  >
+                  <label className="label-mono" style={{ marginBottom: 8 }}>
                     {f.label}
-                    {f.required && <span style={{ color: PURPLE, marginLeft: 4 }}>*</span>}
+                    {f.required && <span style={{ color: 'var(--primary)', marginLeft: 4 }}>*</span>}
                   </label>
                   <div style={{ position: 'relative' }}>
                     {f.prefix && (
@@ -705,9 +687,9 @@ export default function RevenueCalculator() {
                           left: 14,
                           top: '50%',
                           transform: 'translateY(-50%)',
-                          fontFamily: MONO,
+                          fontFamily: 'var(--font-mono)',
                           fontSize: 14,
-                          color: '#94A3B8',
+                          color: 'var(--ink-dim)',
                         }}
                       >
                         {f.prefix}
@@ -720,98 +702,68 @@ export default function RevenueCalculator() {
                       placeholder=""
                       style={{
                         width: '100%',
-                        background: '#F7F8FB',
-                        border: '1px solid #E5E8F0',
-                        borderRadius: 10,
+                        background: 'var(--surface)',
+                        border: '1px solid var(--line)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: `12px 14px 12px ${f.prefix ? '28px' : '14px'}`,
                         fontSize: 15,
-                        color: '#0F172A',
-                        fontFamily: MONO,
+                        color: 'var(--ink)',
+                        fontFamily: 'var(--font-mono)',
                         outline: 'none',
                         boxSizing: 'border-box',
                       }}
                     />
                   </div>
-                  <p style={{ fontSize: 11.5, color: '#94A3B8', marginTop: 6 }}>{f.hint}</p>
+                  <p style={{ fontSize: 11.5, color: 'var(--ink-dim)', marginTop: 6 }}>{f.hint}</p>
                 </div>
               ))}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24, marginBottom: 28 }}>
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontFamily: MONO,
-                    fontSize: 10,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#94A3B8',
-                    marginBottom: 8,
-                  }}
-                >
-                  Current close rate <span style={{ color: PURPLE }}>*</span>
+                <label className="label-mono" style={{ marginBottom: 8 }}>
+                  Current close rate <span style={{ color: 'var(--primary)' }}>*</span>
                 </label>
                 <input type="range" min="1" max="30" value={currentClose} onChange={(e) => setCurrentClose(e.target.value)} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>1%</span>
-                  <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 700, color: PURPLE }}>{currentClose}%</span>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>30%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>1%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: 'var(--primary)' }}>{currentClose}%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>30%</span>
                 </div>
-                <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 4 }}>What you close today, as-is</p>
+                <p style={{ fontSize: 11, color: 'var(--ink-dim)', textAlign: 'center', marginTop: 4 }}>What you close today, as-is</p>
               </div>
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontFamily: MONO,
-                    fontSize: 10,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#94A3B8',
-                    marginBottom: 8,
-                  }}
-                >
-                  Target close rate — editable scenario <span style={{ color: PURPLE }}>*</span>
+                <label className="label-mono" style={{ marginBottom: 8 }}>
+                  Target close rate — editable scenario <span style={{ color: 'var(--primary)' }}>*</span>
                 </label>
                 <input type="range" min="1" max="30" value={targetClose} onChange={(e) => setTargetClose(e.target.value)} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>1%</span>
-                  <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 700, color: GREEN }}>{targetClose}%</span>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>30%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>1%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: 'var(--ok)' }}>{targetClose}%</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>30%</span>
                 </div>
-                <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 4 }}>Achievable with faster, better first contact</p>
+                <p style={{ fontSize: 11, color: 'var(--ink-dim)', textAlign: 'center', marginTop: 4 }}>Achievable with faster, better first contact</p>
               </div>
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontFamily: MONO,
-                    fontSize: 10,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#94A3B8',
-                    marginBottom: 8,
-                  }}
-                >
-                  Avg lead response time <span style={{ color: PURPLE }}>*</span>
+                <label className="label-mono" style={{ marginBottom: 8 }}>
+                  Avg lead response time <span style={{ color: 'var(--primary)' }}>*</span>
                 </label>
                 <input type="range" min="1" max="480" value={responseTime} onChange={(e) => setResponseTime(e.target.value)} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>&lt;1 min</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>&lt;1 min</span>
                   <span
                     style={{
-                      fontFamily: MONO,
+                      fontFamily: 'var(--font-mono)',
                       fontSize: 18,
                       fontWeight: 700,
-                      color: responseTime > 60 ? RED : responseTime > 15 ? AMBER : GREEN,
+                      color: responseTime > 60 ? 'var(--risk)' : responseTime > 15 ? 'var(--warn)' : 'var(--ok)',
                     }}
                   >
                     {formatResp(parseInt(responseTime, 10))}
                   </span>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>8 hrs+</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>8 hrs+</span>
                 </div>
-                <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 4 }}>
+                <p style={{ fontSize: 11, color: 'var(--ink-dim)', textAlign: 'center', marginTop: 4 }}>
                   Risk signal only — not a revenue multiplier
                 </p>
               </div>
@@ -829,7 +781,7 @@ export default function RevenueCalculator() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                style={{ borderTop: '2px solid #F1F3F9', padding: 'clamp(24px, 4vw, 36px)', position: 'relative', overflow: 'hidden' }}
+                style={{ borderTop: '2px solid var(--line-strong)', padding: 'clamp(24px, 4vw, 36px)', position: 'relative', overflow: 'hidden' }}
               >
                 {/* Watermark Logo (Subtle Background) */}
                 <div
@@ -853,9 +805,9 @@ export default function RevenueCalculator() {
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   {/* Visible only when printing */}
                   <div className="print-header">
-                    <div style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>ORVN LABS</div>
-                    <div style={{ fontSize: 14, color: '#5B3FD4', fontWeight: 600 }}>Official Revenue Audit Report</div>
-                    <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 12 }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--ink)', marginBottom: 4 }}>ORVN LABS</div>
+                    <div style={{ fontSize: 14, color: 'var(--primary)', fontWeight: 600 }}>Official Revenue Audit Report</div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-dim)', marginTop: 12 }}>
                       Generated for: {email || 'Anonymous Operator'} · {new Date().toLocaleDateString()}
                     </div>
                   </div>
@@ -863,9 +815,9 @@ export default function RevenueCalculator() {
                   {R.hasGap ? (
                     <div
                       style={{
-                        background: '#EEEAFB',
+                        background: 'var(--primary-pale)',
                         border: '1px solid #C7BCF5',
-                        borderRadius: 14,
+                        borderRadius: 'var(--radius-sm)',
                         padding: 32,
                         textAlign: 'center',
                         marginBottom: 20,
@@ -873,10 +825,10 @@ export default function RevenueCalculator() {
                     >
                       <div
                         style={{
-                          fontFamily: MONO,
+                          fontFamily: 'var(--font-mono)',
                           fontSize: 10,
                           letterSpacing: '0.16em',
-                          color: PURPLE,
+                          color: 'var(--primary)',
                           textTransform: 'uppercase',
                           marginBottom: 12,
                         }}
@@ -885,16 +837,16 @@ export default function RevenueCalculator() {
                       </div>
                       <div
                         style={{
-                          fontFamily: DISPLAY,
+                          fontFamily: 'var(--font-display)',
                           fontSize: 'clamp(48px, 8vw, 78px)',
-                          color: PURPLE,
+                          color: 'var(--primary)',
                           lineHeight: 1,
                           marginBottom: 8,
                         }}
                       >
                         <AnimCounter target={R.recoverableYear} prefix="$" />
                       </div>
-                      <p style={{ fontSize: 13, color: '#475569', margin: 0 }}>
+                      <p style={{ fontSize: 13, color: 'var(--ink-mid)', margin: 0 }}>
                         Close-rate opportunity · math shown below · database reactivation shown separately
                       </p>
 
@@ -912,21 +864,21 @@ export default function RevenueCalculator() {
                   ) : (
                     <div
                       style={{
-                        background: '#F7F8FB',
-                        border: '1px solid #E5E8F0',
-                        borderLeft: `3px solid ${PURPLE}`,
-                        borderRadius: 14,
+                        background: 'var(--surface)',
+                        border: '1px solid var(--line)',
+                        borderLeft: '3px solid var(--primary)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: 28,
                         marginBottom: 20,
                       }}
                     >
-                      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', color: PURPLE, textTransform: 'uppercase', marginBottom: 10 }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.16em', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: 10 }}>
                         Estimated annual recoverable opportunity · $0
                       </div>
-                      <p style={{ fontSize: 14.5, color: '#0F172A', margin: 0, lineHeight: 1.7 }}>
-                        Based on your inputs, there’s no modeled close-rate gap to recover — your
-                        target rate isn’t higher than your current rate. Faster first contact still
-                        reduces risk on the leads you’re currently losing — see the response-time risk
+                      <p style={{ fontSize: 14.5, color: 'var(--ink)', margin: 0, lineHeight: 1.7 }}>
+                        Based on your inputs, there's no modeled close-rate gap to recover — your
+                        target rate isn't higher than your current rate. Faster first contact still
+                        reduces risk on the leads you're currently losing — see the response-time risk
                         below.
                       </p>
                       <div className="no-print" style={{ marginTop: 20, display: 'flex', gap: 12 }}>
@@ -947,74 +899,74 @@ export default function RevenueCalculator() {
                       background: R.band.bg,
                       border: `1px solid ${R.band.border}`,
                       borderLeft: `3px solid ${R.band.tone}`,
-                      borderRadius: 10,
+                      borderRadius: 'var(--radius-sm)',
                       padding: '16px 20px',
                       marginBottom: 20,
                     }}
                   >
-                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: R.band.text, marginBottom: 6 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: R.band.text, marginBottom: 6 }}>
                       Response-time risk
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 600, color: '#0F172A', marginBottom: 8 }}>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', marginBottom: 8 }}>
                       {formatResp(R.rt)} — {R.band.label}
                     </div>
-                    <p style={{ fontSize: 13.5, color: '#475569', margin: 0, lineHeight: 1.65 }}>
+                    <p style={{ fontSize: 13.5, color: 'var(--ink-mid)', margin: 0, lineHeight: 1.65 }}>
                       Faster first contact protects intent before it cools. The sub-5-minute window is
-                      the ceiling most operations never reach — not because people aren’t trying, but
+                      the ceiling most operations never reach — not because people aren't trying, but
                       because no human is on every inbound lead the moment it arrives.
                     </p>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
                     {[
-                      { label: 'Recoverable deals / month', value: Number(R.recoverableDeals.toFixed(1)), color: GREEN, sub: 'target − current close' },
-                      { label: 'Recoverable revenue / month', value: Math.round(R.recoverableMonth), prefix: '$', color: GREEN, sub: 'close-rate opportunity' },
-                      { label: 'Database reactivation', value: Math.round(R.graveyardValue), prefix: '$', color: PURPLE, sub: 'separate · illustrative' },
+                      { label: 'Recoverable deals / month', value: Number(R.recoverableDeals.toFixed(1)), color: 'var(--ok)', sub: 'target − current close' },
+                      { label: 'Recoverable revenue / month', value: Math.round(R.recoverableMonth), prefix: '$', color: 'var(--ok)', sub: 'close-rate opportunity' },
+                      { label: 'Database reactivation', value: Math.round(R.graveyardValue), prefix: '$', color: 'var(--primary)', sub: 'separate · illustrative' },
                     ].map((c, i) => (
-                      <div key={i} style={{ background: '#F7F8FB', border: '1px solid #E5E8F0', borderRadius: 10, padding: 18, textAlign: 'center' }}>
-                        <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
+                      <div key={i} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', padding: 18, textAlign: 'center' }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.1em', color: 'var(--ink-dim)', textTransform: 'uppercase', marginBottom: 8 }}>
                           {c.label}
                         </div>
-                        <div style={{ fontFamily: DISPLAY, fontSize: 28, color: c.color, lineHeight: 1, marginBottom: 4 }}>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: c.color, lineHeight: 1, marginBottom: 4 }}>
                           <AnimCounter target={c.value} prefix={c.prefix || ''} />
                         </div>
-                        <div style={{ fontSize: 11, color: '#94A3B8' }}>{c.sub}</div>
+                        <div style={{ fontSize: 11, color: 'var(--ink-dim)' }}>{c.sub}</div>
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ background: '#F7F8FB', border: '1px solid #E5E8F0', borderRadius: 10, padding: 20, marginBottom: 20 }}>
-                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', color: AMBER, textTransform: 'uppercase', marginBottom: 14 }}>
+                  <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', padding: 20, marginBottom: 20 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em', color: 'var(--warn)', textTransform: 'uppercase', marginBottom: 14 }}>
                       Step-by-step calculation
                     </div>
                     <MathRow label="Monthly leads" value={R.L} />
                     <MathRow label="Current close rate" value={pct(R.curCR)} />
-                    <MathRow label="Target close rate (editable scenario)" value={pct(R.tgtCR)} color={GREEN} />
+                    <MathRow label="Target close rate (editable scenario)" value={pct(R.tgtCR)} color="var(--ok)" />
                     <MathRow label={`Current deals/month  (${R.L} × ${pct(R.curCR)})`} value={R.currentDeals.toFixed(1)} />
-                    <MathRow label={`Target deals/month  (${R.L} × ${pct(R.tgtCR)})`} value={R.targetDeals.toFixed(1)} color={GREEN} />
-                    <MathRow label="Recoverable deals/month  (target − current)" value={R.recoverableDeals.toFixed(1)} color={GREEN} />
-                    <MathRow label={`Recoverable revenue/month  (${R.recoverableDeals.toFixed(1)} × ${fm(R.C)})`} value={fm(R.recoverableMonth)} color={GREEN} />
-                    <MathRow label="Recoverable revenue/year  (× 12)" value={fm(R.recoverableYear)} color={GREEN} bold border={false} />
+                    <MathRow label={`Target deals/month  (${R.L} × ${pct(R.tgtCR)})`} value={R.targetDeals.toFixed(1)} color="var(--ok)" />
+                    <MathRow label="Recoverable deals/month  (target − current)" value={R.recoverableDeals.toFixed(1)} color="var(--ok)" />
+                    <MathRow label={`Recoverable revenue/month  (${R.recoverableDeals.toFixed(1)} × ${fm(R.C)})`} value={fm(R.recoverableMonth)} color="var(--ok)" />
+                    <MathRow label="Recoverable revenue/year  (× 12)" value={fm(R.recoverableYear)} color="var(--ok)" bold border={false} />
                     {!R.hasGap && (
-                      <div style={{ marginTop: 10, fontSize: 12.5, color: '#92400E', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ marginTop: 10, fontSize: 12.5, color: '#92400E', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
                         Guardrail: target ≤ current, so recoverable opportunity is set to $0.
                       </div>
                     )}
                   </div>
 
                   {R.CRM > 0 && (
-                    <div style={{ background: '#F7F8FB', border: '1px solid #E5E8F0', borderRadius: 10, padding: 20, marginBottom: 20 }}>
-                      <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', color: PURPLE, textTransform: 'uppercase', marginBottom: 6 }}>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', padding: 20, marginBottom: 20 }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: 6 }}>
                         Database reactivation — separate bucket
                       </div>
-                      <p style={{ fontSize: 12.5, color: '#94A3B8', margin: '0 0 12px', lineHeight: 1.6 }}>
+                      <p style={{ fontSize: 12.5, color: 'var(--ink-dim)', margin: '0 0 12px', lineHeight: 1.6 }}>
                         Kept separate from the close-rate opportunity above. The re-engagement rate is
                         an editable, illustrative assumption — not research-backed.
                       </p>
-                      <MathRow label={`Re-engageable leads  (${R.CRM.toLocaleString()} × ${pct(R.reRate)} illustrative)`} value={Math.round(R.reactivatable)} color={PURPLE} />
-                      <MathRow label={`Reactivation close rate  (${pct(R.curCR)} × 40% of current = 60% haircut)`} value={pct1(R.graveyardClose)} color={PURPLE} />
-                      <MathRow label={`Recoverable deals  (${Math.round(R.reactivatable)} × ${pct1(R.graveyardClose)})`} value={R.graveyardDeals.toFixed(1)} color={PURPLE} />
-                      <MathRow label={`Database reactivation value  (${R.graveyardDeals.toFixed(1)} × ${fm(R.C)})`} value={fm(R.graveyardValue)} color={PURPLE} bold border={false} />
+                      <MathRow label={`Re-engageable leads  (${R.CRM.toLocaleString()} × ${pct(R.reRate)} illustrative)`} value={Math.round(R.reactivatable)} color="var(--primary)" />
+                      <MathRow label={`Reactivation close rate  (${pct(R.curCR)} × 40% of current = 60% haircut)`} value={pct1(R.graveyardClose)} color="var(--primary)" />
+                      <MathRow label={`Recoverable deals  (${Math.round(R.reactivatable)} × ${pct1(R.graveyardClose)})`} value={R.graveyardDeals.toFixed(1)} color="var(--primary)" />
+                      <MathRow label={`Database reactivation value  (${R.graveyardDeals.toFixed(1)} × ${fm(R.C)})`} value={fm(R.graveyardValue)} color="var(--primary)" bold border={false} />
                     </div>
                   )}
 
@@ -1022,54 +974,54 @@ export default function RevenueCalculator() {
                     <div
                       style={{
                         background: '#fff',
-                        border: '1px solid #E5E8F0',
-                        borderRadius: 10,
+                        border: '1px solid var(--line)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: 18,
                         marginBottom: 20,
                       }}
                     >
-                      <MathRow label="Recoverable revenue/year (close-rate opportunity)" value={fm(R.recoverableYear)} color={GREEN} />
-                      <MathRow label="Database reactivation (illustrative)" value={fm(R.graveyardValue)} color={PURPLE} />
-                      <MathRow label="Combined upside scenario (revenue opportunity + database reactivation)" value={fm(R.combinedUpside)} color={PURPLE} bold border={false} />
+                      <MathRow label="Recoverable revenue/year (close-rate opportunity)" value={fm(R.recoverableYear)} color="var(--ok)" />
+                      <MathRow label="Database reactivation (illustrative)" value={fm(R.graveyardValue)} color="var(--primary)" />
+                      <MathRow label="Combined upside scenario (revenue opportunity + database reactivation)" value={fm(R.combinedUpside)} color="var(--primary)" bold border={false} />
                     </div>
                   )}
 
                   {/* Assumptions note */}
                   <div
                     style={{
-                      background: '#F7F8FB',
+                      background: 'var(--surface)',
                       border: '1px dashed #C7BCF5',
-                      borderRadius: 10,
+                      borderRadius: 'var(--radius-sm)',
                       padding: '14px 18px',
                       marginBottom: 20,
                     }}
                   >
-                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.12em', color: PURPLE, textTransform: 'uppercase', marginBottom: 8 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.12em', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: 8 }}>
                       Assumptions in this model
                     </div>
-                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: '#475569', lineHeight: 1.7 }}>
+                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: 'var(--ink-mid)', lineHeight: 1.7 }}>
                       <li>Recoverable opportunity = (target − current close rate) × leads × commission. Close rate is never penalized twice.</li>
                       <li>Response time is a qualitative risk signal only — it does not multiply any dollar figure.</li>
                       <li>Database reactivation uses an editable {pct(R.reRate)} re-engagement assumption and a reactivation close rate of 40% of your current rate. Both are illustrative, not research-backed.</li>
-                      {R.crmFallback ? <li>CRM size was left blank, so it’s estimated at ~24 months of your monthly lead volume.</li> : null}
+                      {R.crmFallback ? <li>CRM size was left blank, so it's estimated at ~24 months of your monthly lead volume.</li> : null}
                       {R.ISA > 0 && <li>ISA coverage assumes ~{R.isaHoursWeek} hrs/week ({R.isaAnnualHours.toLocaleString()} hrs/year) against 24/7 ({R.pasAnnualHours.toLocaleString()} hrs/year).</li>}
                     </ul>
                   </div>
 
                   <div
                     style={{
-                      background: '#F7F8FB',
-                      border: '1px solid #E5E8F0',
-                      borderLeft: `3px solid ${PURPLE}`,
-                      borderRadius: 10,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--line)',
+                      borderLeft: '3px solid var(--primary)',
+                      borderRadius: 'var(--radius-sm)',
                       padding: '18px 20px',
                       marginBottom: 20,
                     }}
                   >
-                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.12em', color: PURPLE, textTransform: 'uppercase', marginBottom: 10 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.12em', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: 10 }}>
                       ORVN analysis
                     </div>
-                    <p style={{ fontSize: 14, lineHeight: 1.8, color: '#0F172A', margin: 0 }}>{R.insight}</p>
+                    <p style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--ink)', margin: 0 }}>{R.insight}</p>
                   </div>
 
                   <button
@@ -1095,12 +1047,12 @@ export default function RevenueCalculator() {
                         transition={{ duration: 0.3 }}
                         style={{ marginBottom: 20 }}
                       >
-                        <div style={{ background: '#EEEAFB', border: '1px solid #C7BCF5', borderRadius: 12, padding: 22, marginBottom: 14 }}>
-                          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: PURPLE, marginBottom: 8 }}>
+                        <div style={{ background: 'var(--primary-pale)', border: '1px solid #C7BCF5', borderRadius: 'var(--radius-sm)', padding: 22, marginBottom: 14 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--primary)', marginBottom: 8 }}>
                             ORVN — Full revenue audit
                           </div>
-                          <div style={{ fontFamily: DISPLAY, fontSize: 22, color: '#0F172A', marginBottom: 4 }}>Revenue Audit Report</div>
-                          <div style={{ fontSize: 12, color: '#475569', marginBottom: 12 }}>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--ink)', marginBottom: 4 }}>Revenue Audit Report</div>
+                          <div style={{ fontSize: 12, color: 'var(--ink-mid)', marginBottom: 12 }}>
                             Prepared {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                           </div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
@@ -1113,34 +1065,34 @@ export default function RevenueCalculator() {
                               ...(R.CRM > 0 ? [['CRM size', R.CRM.toLocaleString()]] : []),
                             ].map(([k, v]) => (
                               <div key={k} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                                <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A3B8' }}>{k}:</span>
-                                <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#0F172A' }}>{v}</span>
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-dim)' }}>{k}:</span>
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'var(--ink)' }}>{v}</span>
                               </div>
                             ))}
                           </div>
                         </div>
 
                         <AuditPanel number="1" title="Close-rate opportunity analysis">
-                          <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderLeft: `3px solid ${GREEN}`, borderRadius: 8, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#065F46' }}>
+                          <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderLeft: '3px solid var(--ok)', borderRadius: 'var(--radius-sm)', padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#065F46' }}>
                             <strong>Finding:</strong> Lifting your close rate from <strong>{pct(R.curCR)}</strong> to a target of <strong>{pct(R.tgtCR)}</strong> models <strong>{R.recoverableDeals.toFixed(1)} additional deals/month</strong>. {R.hasGap ? '' : 'Your target is not above your current rate, so the modeled opportunity is $0.'}
                           </div>
-                          <div style={{ border: '1px solid #E5E8F0', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+                          <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: 16 }}>
                             <div style={{ overflowX: 'auto' }}>
                               <TblRow header cols={[{ text: 'Metric' }, { text: 'Current' }, { text: 'Target scenario' }, { text: 'Gap' }]} />
-                              <TblRow cols={[{ text: 'Close rate' }, { text: pct(R.curCR) }, { text: pct(R.tgtCR), color: GREEN }, { text: R.hasGap ? `+${pct(R.tgtCR - R.curCR)}` : '0%', color: R.hasGap ? GREEN : '#94A3B8' }]} />
-                              <TblRow cols={[{ text: 'Deals/month' }, { text: R.currentDeals.toFixed(1) }, { text: R.targetDeals.toFixed(1), color: GREEN }, { text: `+${R.recoverableDeals.toFixed(1)}`, color: GREEN }]} />
+                              <TblRow cols={[{ text: 'Close rate' }, { text: pct(R.curCR) }, { text: pct(R.tgtCR), color: 'var(--ok)' }, { text: R.hasGap ? `+${pct(R.tgtCR - R.curCR)}` : '0%', color: R.hasGap ? 'var(--ok)' : 'var(--ink-dim)' }]} />
+                              <TblRow cols={[{ text: 'Deals/month' }, { text: R.currentDeals.toFixed(1) }, { text: R.targetDeals.toFixed(1), color: 'var(--ok)' }, { text: `+${R.recoverableDeals.toFixed(1)}`, color: 'var(--ok)' }]} />
                             </div>
                           </div>
-                          <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-                            <div style={{ fontFamily: DISPLAY, fontSize: 40, color: GREEN, lineHeight: 1, marginBottom: 6 }}>{fm(R.recoverableYear)}</div>
-                            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.12em', color: '#94A3B8', textTransform: 'uppercase' }}>
+                          <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 'var(--radius-sm)', padding: 20, textAlign: 'center' }}>
+                            <div style={{ fontFamily: 'var(--font-display)', fontSize: 40, color: 'var(--ok)', lineHeight: 1, marginBottom: 6 }}>{fm(R.recoverableYear)}</div>
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.12em', color: 'var(--ink-dim)', textTransform: 'uppercase' }}>
                               Annual recoverable revenue opportunity
                             </div>
                           </div>
                         </AuditPanel>
 
                         <AuditPanel number="2" title="Response-time risk (qualitative)">
-                          <div style={{ background: R.band.bg, border: `1px solid ${R.band.border}`, borderLeft: `3px solid ${R.band.tone}`, borderRadius: 8, padding: '12px 16px', fontSize: 13.5, color: R.band.text }}>
+                          <div style={{ background: R.band.bg, border: `1px solid ${R.band.border}`, borderLeft: `3px solid ${R.band.tone}`, borderRadius: 'var(--radius-sm)', padding: '12px 16px', fontSize: 13.5, color: R.band.text }}>
                             <strong>Finding:</strong> Your response time of <strong>{formatResp(R.rt)}</strong> falls in the <strong>{R.band.label}</strong> band.
                           </div>
                           <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1151,37 +1103,37 @@ export default function RevenueCalculator() {
                               ['1–4 hours', 'High delay'],
                               ['4+ hours', 'Severe delay'],
                             ].map(([range, label]) => (
-                              <div key={range} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0', borderBottom: '1px solid #F1F3F9' }}>
-                                <span style={{ color: '#475569' }}>{range}</span>
-                                <span style={{ fontFamily: MONO, fontSize: 12, color: label === R.band.label ? R.band.tone : '#94A3B8', fontWeight: label === R.band.label ? 700 : 400 }}>{label}</span>
+                              <div key={range} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0', borderBottom: '1px solid var(--line-strong)' }}>
+                                <span style={{ color: 'var(--ink-mid)' }}>{range}</span>
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: label === R.band.label ? R.band.tone : 'var(--ink-dim)', fontWeight: label === R.band.label ? 700 : 400 }}>{label}</span>
                               </div>
                             ))}
                           </div>
-                          <p style={{ fontSize: 12.5, color: '#94A3B8', margin: '12px 0 0', lineHeight: 1.65 }}>
+                          <p style={{ fontSize: 12.5, color: 'var(--ink-dim)', margin: '12px 0 0', lineHeight: 1.65 }}>
                             Response time is a risk signal, not a revenue multiplier. There is no
                             sourced response-time→conversion distribution behind a dollar figure, so we
-                            don’t invent one.
+                            don't invent one.
                           </p>
                         </AuditPanel>
 
                         {R.CRM > 0 && (
                           <AuditPanel number="3" title="Database reactivation (illustrative)">
-                            <div style={{ background: '#EEEAFB', border: '1px solid #C7BCF5', borderLeft: `3px solid ${PURPLE}`, borderRadius: 8, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#3A2899' }}>
+                            <div style={{ background: 'var(--primary-pale)', border: '1px solid #C7BCF5', borderLeft: '3px solid var(--primary)', borderRadius: 'var(--radius-sm)', padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#3A2899' }}>
                               <strong>Finding:</strong> Your database of <strong>{R.CRM.toLocaleString()} leads</strong> may hold recoverable revenue. The figures below use editable, illustrative assumptions — not research-backed rates.
                             </div>
-                            <div style={{ border: '1px solid #E5E8F0', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+                            <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: 16 }}>
                               <div style={{ overflowX: 'auto' }}>
                                 <TblRow header cols={[{ text: 'Component' }, { text: 'Value' }, { text: 'Formula' }, { text: 'Basis' }]} />
                                 <TblRow cols={[{ text: 'CRM database' }, { text: `${R.CRM.toLocaleString()} leads` }, { text: 'Your input' }, { text: '—' }]} />
                                 <TblRow cols={[{ text: 'Re-engagement rate' }, { text: pct(R.reRate) }, { text: `CRM × ${pct(R.reRate)}` }, { text: 'Illustrative' }]} />
-                                <TblRow cols={[{ text: 'Re-engageable leads' }, { text: `${Math.round(R.reactivatable)} leads`, color: PURPLE }, { text: '' }, { text: '' }]} />
+                                <TblRow cols={[{ text: 'Re-engageable leads' }, { text: `${Math.round(R.reactivatable)} leads`, color: 'var(--primary)' }, { text: '' }, { text: '' }]} />
                                 <TblRow cols={[{ text: 'Reactivation close rate' }, { text: pct1(R.graveyardClose) }, { text: `${pct(R.curCR)} × 40% of current` }, { text: 'Conservative' }]} />
-                                <TblRow cols={[{ text: 'Recoverable deals' }, { text: `${R.graveyardDeals.toFixed(1)} deals`, color: PURPLE }, { text: '' }, { text: '' }]} />
+                                <TblRow cols={[{ text: 'Recoverable deals' }, { text: `${R.graveyardDeals.toFixed(1)} deals`, color: 'var(--primary)' }, { text: '' }, { text: '' }]} />
                               </div>
                             </div>
-                            <div style={{ background: '#EEEAFB', border: '1px solid #C7BCF5', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-                              <div style={{ fontFamily: DISPLAY, fontSize: 40, color: PURPLE, lineHeight: 1, marginBottom: 6 }}>{fm(R.graveyardValue)}</div>
-                              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.12em', color: '#94A3B8', textTransform: 'uppercase' }}>
+                            <div style={{ background: 'var(--primary-pale)', border: '1px solid #C7BCF5', borderRadius: 'var(--radius-sm)', padding: 20, textAlign: 'center' }}>
+                              <div style={{ fontFamily: 'var(--font-display)', fontSize: 40, color: 'var(--primary)', lineHeight: 1, marginBottom: 6 }}>{fm(R.graveyardValue)}</div>
+                              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.12em', color: 'var(--ink-dim)', textTransform: 'uppercase' }}>
                                 Illustrative database reactivation value
                               </div>
                             </div>
@@ -1190,16 +1142,16 @@ export default function RevenueCalculator() {
 
                         {R.ISA > 0 && (
                           <AuditPanel number={R.CRM > 0 ? '4' : '3'} title="ISA coverage & cost context">
-                            <div style={{ border: '1px solid #E5E8F0', borderRadius: 8, overflow: 'hidden' }}>
+                            <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
                               <div style={{ overflowX: 'auto' }}>
                                 <TblRow header cols={[{ text: 'Component' }, { text: 'Human ISA' }, { text: 'PAS' }, { text: 'Note' }]} />
-                                <TblRow cols={[{ text: 'Annual cost' }, { text: `${fm(R.ISA)}/yr`, color: RED }, { text: 'Custom early-access quote' }, { text: 'Your input' }]} />
-                                <TblRow cols={[{ text: 'Coverage' }, { text: `~${R.isaHoursWeek} hrs/wk (${R.isaAnnualHours.toLocaleString()} hrs/yr)` }, { text: `24/7/365 (${R.pasAnnualHours.toLocaleString()} hrs/yr)`, color: GREEN }, { text: `+${R.coverageGap.toLocaleString()} hrs/yr`, bold: true }]} />
-                                <TblRow cols={[{ text: 'Response time' }, { text: 'Varies by rep & shift', color: RED }, { text: 'Consistent, every channel', color: GREEN }, { text: 'Structural' }]} />
-                                <TblRow cols={[{ text: 'Turnover risk' }, { text: 'Typically high-turnover', color: RED }, { text: 'Infrastructure', color: GREEN }, { text: 'No re-hire cost' }]} />
+                                <TblRow cols={[{ text: 'Annual cost' }, { text: `${fm(R.ISA)}/yr`, color: 'var(--risk)' }, { text: 'Custom early-access quote' }, { text: 'Your input' }]} />
+                                <TblRow cols={[{ text: 'Coverage' }, { text: `~${R.isaHoursWeek} hrs/wk (${R.isaAnnualHours.toLocaleString()} hrs/yr)` }, { text: `24/7/365 (${R.pasAnnualHours.toLocaleString()} hrs/yr)`, color: 'var(--ok)' }, { text: `+${R.coverageGap.toLocaleString()} hrs/yr`, bold: true }]} />
+                                <TblRow cols={[{ text: 'Response time' }, { text: 'Varies by rep & shift', color: 'var(--risk)' }, { text: 'Consistent, every channel', color: 'var(--ok)' }, { text: 'Structural' }]} />
+                                <TblRow cols={[{ text: 'Turnover risk' }, { text: 'Typically high-turnover', color: 'var(--risk)' }, { text: 'Infrastructure', color: 'var(--ok)' }, { text: 'No re-hire cost' }]} />
                               </div>
                             </div>
-                            <p style={{ fontSize: 12.5, color: '#94A3B8', margin: '12px 0 0', lineHeight: 1.65 }}>
+                            <p style={{ fontSize: 12.5, color: 'var(--ink-dim)', margin: '12px 0 0', lineHeight: 1.65 }}>
                               Revenue opportunity and operating-cost savings are different buckets — they
                               are not added together. PAS early-access pricing is quoted per brokerage,
                               so no PAS price is asserted here.
@@ -1208,14 +1160,14 @@ export default function RevenueCalculator() {
                         )}
 
                         <AuditPanel number={[R.CRM > 0, R.ISA > 0].filter(Boolean).length + 3} title="Summary — opportunity by bucket">
-                          <div style={{ border: '1px solid #E5E8F0', borderRadius: 8, overflow: 'hidden' }}>
+                          <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
                             <div style={{ overflowX: 'auto' }}>
                               <TblRow header cols={[{ text: 'Bucket' }, { text: 'Annual value' }, { text: 'Confidence' }, { text: '' }]} />
-                              <TblRow cols={[{ text: 'Recoverable revenue (close-rate opportunity)' }, { text: fm(R.recoverableYear), color: GREEN, bold: true }, { text: 'Your target scenario' }, { text: '' }]} />
-                              {R.CRM > 0 && <TblRow cols={[{ text: 'Database reactivation (illustrative)' }, { text: fm(R.graveyardValue), color: PURPLE, bold: true }, { text: 'Illustrative assumptions' }, { text: '' }]} />}
+                              <TblRow cols={[{ text: 'Recoverable revenue (close-rate opportunity)' }, { text: fm(R.recoverableYear), color: 'var(--ok)', bold: true }, { text: 'Your target scenario' }, { text: '' }]} />
+                              {R.CRM > 0 && <TblRow cols={[{ text: 'Database reactivation (illustrative)' }, { text: fm(R.graveyardValue), color: 'var(--primary)', bold: true }, { text: 'Illustrative assumptions' }, { text: '' }]} />}
                               {R.CRM > 0 && (
-                                <div style={{ background: '#EEEAFB', borderTop: '2px solid #C7BCF5' }}>
-                                  <TblRow cols={[{ text: 'Combined upside scenario', bold: true }, { text: fm(R.combinedUpside), color: PURPLE, bold: true }, { text: 'Revenue + reactivation' }, { text: '' }]} />
+                                <div style={{ background: 'var(--primary-pale)', borderTop: '2px solid #C7BCF5' }}>
+                                  <TblRow cols={[{ text: 'Combined upside scenario', bold: true }, { text: fm(R.combinedUpside), color: 'var(--primary)', bold: true }, { text: 'Revenue + reactivation' }, { text: '' }]} />
                                 </div>
                               )}
                               {R.ISA > 0 && <TblRow cols={[{ text: 'ISA cost (separate — operating cost, not revenue)' }, { text: `${fm(R.ISA)}/yr` }, { text: 'Context only' }, { text: '' }]} />}
@@ -1228,11 +1180,11 @@ export default function RevenueCalculator() {
                               { n: 2, text: R.CRM > 0 ? `This week: run a re-engagement pass on your database. The ${fm(R.graveyardValue)} above is illustrative — treat it as a hypothesis to test, not a promise.` : 'This week: capture your CRM database size to model database reactivation as a separate bucket.' },
                               { n: 3, text: 'This month: run the Lead Leakage Scorecard to identify the single bottleneck with the highest payoff.' },
                             ].map((s) => (
-                              <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#F7F8FB', border: '1px solid #E5E8F0', borderRadius: 8, padding: '12px 14px' }}>
-                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: PURPLE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: MONO, fontSize: 10, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                              <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', padding: '12px 14px' }}>
+                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                                   {s.n}
                                 </div>
-                                <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: 0 }}>{s.text}</p>
+                                <p style={{ fontSize: 13, color: 'var(--ink-mid)', lineHeight: 1.65, margin: 0 }}>{s.text}</p>
                               </div>
                             ))}
                           </div>
@@ -1247,19 +1199,19 @@ export default function RevenueCalculator() {
 
                   <div
                     style={{
-                      background: '#F7F8FB',
-                      border: '1px solid #E5E8F0',
-                      borderRadius: 14,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--line)',
+                      borderRadius: 'var(--radius-sm)',
                       padding: 28,
                       marginTop: 8,
                     }}
                   >
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, alignItems: 'center' }}>
                       <div>
-                        <h3 style={{ fontSize: 20, fontFamily: DISPLAY, color: '#0F172A', margin: '0 0 6px' }}>
+                        <h3 style={{ fontSize: 20, fontFamily: 'var(--font-display)', color: 'var(--ink)', margin: '0 0 6px' }}>
                           Email me the full audit report.
                         </h3>
-                        <p style={{ fontSize: 13.5, color: '#475569', margin: 0, lineHeight: 1.6 }}>
+                        <p style={{ fontSize: 13.5, color: 'var(--ink-mid)', margin: 0, lineHeight: 1.6 }}>
                           A copy of these numbers, the math, and a one-page diagnosis you can share
                           with your team. No spam.
                         </p>
@@ -1269,7 +1221,7 @@ export default function RevenueCalculator() {
                           style={{
                             background: '#ECFDF5',
                             border: '1px solid #A7F3D0',
-                            borderRadius: 10,
+                            borderRadius: 'var(--radius-sm)',
                             padding: 16,
                             display: 'flex',
                             alignItems: 'center',
@@ -1294,11 +1246,11 @@ export default function RevenueCalculator() {
                             style={{
                               flex: '1 1 200px',
                               background: '#fff',
-                              border: '1px solid #E5E8F0',
-                              borderRadius: 10,
+                              border: '1px solid var(--line)',
+                              borderRadius: 'var(--radius-sm)',
                               padding: '12px 14px',
                               fontSize: 14,
-                              color: '#0F172A',
+                              color: 'var(--ink)',
                               outline: 'none',
                             }}
                           />
@@ -1313,7 +1265,7 @@ export default function RevenueCalculator() {
                         </form>
                       )}
                     </div>
-                    <p style={{ fontSize: 12, color: '#94A3B8', marginTop: 12, width: '100%', textAlign: 'center' }}>
+                    <p style={{ fontSize: 12, color: 'var(--ink-dim)', marginTop: 12, width: '100%', textAlign: 'center' }}>
                       Check your spam folder if you don't see the report in 5 minutes.
                     </p>
                   </div>

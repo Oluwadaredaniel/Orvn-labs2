@@ -7,6 +7,7 @@ import Section from '../components/ui/Section';
 import ContentRenderer from '../components/ContentRenderer';
 import Newsletter from '../components/Newsletter';
 import { useDocumentMeta } from '../lib/seo';
+import { supabase, getRelatedPosts } from '../lib/supabase';
 
 const fmt = (iso) =>
   new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -52,11 +53,15 @@ export default function BlogPost() {
 
   const loadComments = async () => {
     try {
-      const res = await fetch(`/api/blog/comments/list?slug=${slug}`);
-      if (res.ok) {
-        const data = await res.json();
-        setComments(data.comments || []);
-      }
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*')
+        .eq('post_slug', slug)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setComments(data || []);
     } catch (err) {
       console.warn('Failed to load comments:', err);
     }
@@ -68,26 +73,23 @@ export default function BlogPost() {
 
     setSubmittingComment(true);
     try {
-      const res = await fetch('/api/blog/comments/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          slug,
+      const { error } = await supabase
+        .from('blog_comments')
+        .insert({
+          post_slug: slug,
           content: comment,
           author_name: commenterName,
           author_email: commenterEmail,
-        }),
-      });
+          status: 'pending',
+        });
 
-      if (res.ok) {
-        setComment('');
-        alert('Your comment has been submitted and is awaiting moderation.');
-      } else {
-        alert('Failed to submit comment. Please try again.');
-      }
+      if (error) throw error;
+
+      setComment('');
+      alert('Your comment has been submitted and is awaiting moderation.');
     } catch (err) {
       console.error('Comment error:', err);
-      alert('An error occurred.');
+      alert('Failed to submit comment. Please try again.');
     } finally {
       setSubmittingComment(false);
     }
@@ -106,10 +108,19 @@ export default function BlogPost() {
     }
 
     try {
-      const res = await fetch(`/api/blog/increment-likes?slug=${slug}`, { method: 'POST' });
-      if (res.ok) {
-        const data = await res.json();
-        setLikesCount(data.likes_count);
+      const { data: post } = await supabase
+        .from('blog_posts')
+        .select('likes_count')
+        .eq('slug', slug)
+        .single();
+
+      if (post) {
+        await supabase
+          .from('blog_posts')
+          .update({ likes_count: (post.likes_count || 0) + 1 })
+          .eq('slug', slug);
+
+        setLikesCount((post.likes_count || 0) + 1);
       }
     } catch (err) {
       console.warn('Failed to increment likes:', err);
@@ -133,29 +144,58 @@ export default function BlogPost() {
       setLoading(true);
       setNotFound(false);
 
-      const res = await fetch(`/api/blog/post?slug=${slug}${isPreview ? '&preview=true' : ''}`);
-      if (!res.ok) {
-        if (res.status === 404) {
-          setNotFound(true);
-        }
-        throw new Error('Failed to load post');
+      let query = supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug);
+
+      if (!isPreview) {
+        query = query.eq('is_published', true);
       }
 
-      const data = await res.json();
-      setPost(data.post);
-      setAuthor(data.authorDetails);
-      setRelated(data.related || []);
-      setPrev(data.prev);
-      setNext(data.next);
-      setLikesCount(data.post.likes_count || 0);
+      const { data: post, error } = await query.single();
+
+      if (error || !post) {
+        setNotFound(true);
+        throw new Error('Post not found');
+      }
+
+      setPost(post);
+      setLikesCount(post.likes_count || 0);
+
+      // Fetch related posts
+      const relatedPosts = await getRelatedPosts(slug, post.category, 3);
+      setRelated(relatedPosts);
+
+      // Fetch prev/next posts
+      const { data: prevPost } = await supabase
+        .from('blog_posts')
+        .select('slug, title')
+        .eq('is_published', true)
+        .lt('published_at', post.published_at)
+        .order('published_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const { data: nextPost } = await supabase
+        .from('blog_posts')
+        .select('slug, title')
+        .eq('is_published', true)
+        .gt('published_at', post.published_at)
+        .order('published_at', { ascending: true })
+        .limit(1)
+        .single();
+
+      setPrev(prevPost);
+      setNext(nextPost);
 
       // Process body and generate TOC
       const parser = new DOMParser();
-      const doc = parser.parseFromString(data.post.body, 'text/html');
+      const doc = parser.parseFromString(post.body, 'text/html');
       const headings = Array.from(doc.querySelectorAll('h2, h3')).map((h, i) => {
         const id = `heading-${i}`;
         h.setAttribute('id', id);
-        h.setAttribute('data-toc-id', id); // for smooth scroll targeting
+        h.setAttribute('data-toc-id', id);
         return {
           id: id,
           text: h.innerText,
@@ -166,7 +206,11 @@ export default function BlogPost() {
       setProcessedBody(doc.body.innerHTML);
 
       // Increment views (fire and forget)
-      fetch(`/api/blog/increment-views?slug=${slug}`, { method: 'POST' })
+      supabase
+        .from('blog_posts')
+        .update({ views_count: (post.views_count || 0) + 1 })
+        .eq('slug', slug)
+        .then(() => {})
         .catch((err) => console.warn('Failed to increment views:', err));
     } catch (err) {
       console.error('Failed to load post:', err);

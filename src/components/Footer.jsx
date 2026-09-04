@@ -47,9 +47,9 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: '#FFFFFF',
-        borderTop: '1px solid #E5E8F0',
-        padding: '80px 0 36px',
+        background: 'var(--background)',
+        borderTop: '1px solid var(--line)',
+        padding: 'var(--space-lg) 0 36px',
         position: 'relative',
         zIndex: 10,
       }}
@@ -67,11 +67,11 @@ export default function Footer() {
             <div style={{ marginBottom: 40 }}>
               <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                 <Logo size={32} />
-                <span style={{ fontWeight: 800, fontSize: 18, color: '#0F172A', letterSpacing: '-0.02em' }}>
-                  ORVN <span style={{ color: '#5B3FD4' }}>Labs</span>
+                <span style={{ fontWeight: 800, fontSize: 18, color: 'var(--ink)', letterSpacing: '-0.02em', fontFamily: 'var(--font-display)' }}>
+                  ORVN <span style={{ color: 'var(--primary)' }}>Labs</span>
                 </span>
               </Link>
-              <p style={{ color: '#475569', fontSize: 14, lineHeight: 1.6, maxWidth: 280, margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p style={{ color: 'var(--ink-mid)', fontSize: 14, lineHeight: 1.6, maxWidth: 280, margin: 0, fontFamily: 'var(--font-body)' }}>
                 Brokerage intelligence infrastructure. PAS controls what happens between inquiry and qualified appointment.
               </p>
               <a
@@ -82,14 +82,14 @@ export default function Footer() {
                   gap: 8,
                   marginTop: 20,
                   fontSize: 13.5,
-                  color: '#5B3FD4',
+                  color: 'var(--primary)',
                   textDecoration: 'none',
                   fontWeight: 600,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: 'var(--font-body)',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => e.target.style.color = '#7B5FEA'}
-                onMouseLeave={(e) => e.target.style.color = '#5B3FD4'}
+                onMouseEnter={(e) => e.target.style.color = 'var(--primary)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--primary)'}
               >
                 <Mail size={15} /> hello@orvnlabs.com
               </a>
@@ -97,17 +97,7 @@ export default function Footer() {
 
             {COLS.map((col) => (
               <div key={col.title}>
-                <h4
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 11,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#94A3B8',
-                    marginBottom: 18,
-                    fontWeight: 700,
-                  }}
-                >
+                <h4 className="label-mono" style={{ marginBottom: 18 }}>
                   {col.title}
                 </h4>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -118,18 +108,18 @@ export default function Footer() {
                           to={link.to}
                           style={{
                             fontSize: 13.5,
-                            color: '#475569',
+                            color: 'var(--ink-mid)',
                             textDecoration: 'none',
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontFamily: 'var(--font-body)',
                             fontWeight: 500,
                             transition: 'all 0.2s',
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.color = '#5B3FD4';
+                            e.target.style.color = 'var(--primary)';
                             e.target.style.paddingLeft = '2px';
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.color = '#475569';
+                            e.target.style.color = 'var(--ink-mid)';
                             e.target.style.paddingLeft = '0px';
                           }}
                         >
@@ -142,18 +132,18 @@ export default function Footer() {
                           rel={link.external ? 'noopener noreferrer' : undefined}
                           style={{
                             fontSize: 13.5,
-                            color: '#475569',
+                            color: 'var(--ink-mid)',
                             textDecoration: 'none',
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontFamily: 'var(--font-body)',
                             fontWeight: 500,
                             transition: 'all 0.2s',
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.color = '#5B3FD4';
+                            e.target.style.color = 'var(--primary)';
                             e.target.style.paddingLeft = '2px';
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.color = '#475569';
+                            e.target.style.color = 'var(--ink-mid)';
                             e.target.style.paddingLeft = '0px';
                           }}
                         >
@@ -176,13 +166,13 @@ export default function Footer() {
             flexWrap: 'wrap',
             gap: 16,
             paddingTop: 28,
-            borderTop: '1px solid #E5E8F0',
+            borderTop: '1px solid var(--line)',
           }}
         >
-          <p style={{ fontSize: 12.5, color: '#94A3B8', margin: 0, fontWeight: 500, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <p style={{ fontSize: 12.5, color: 'var(--ink-dim)', margin: 0, fontWeight: 500, fontFamily: 'var(--font-body)' }}>
             © {year} ORVN Labs. Built for real estate brokerages. PAS is a product of ORVN Labs.
           </p>
-          <p style={{ fontSize: 12.5, color: '#94A3B8', margin: 0, fontWeight: 500, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <p style={{ fontSize: 12.5, color: 'var(--ink-dim)', margin: 0, fontWeight: 500, fontFamily: 'var(--font-body)' }}>
             Not affiliated with Fair Housing enforcement agencies. Not a CRM.
           </p>
         </div>

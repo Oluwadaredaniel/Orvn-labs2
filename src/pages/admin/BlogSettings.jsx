@@ -143,6 +143,7 @@ export default function BlogSettings() {
                ))}
             </div>
           </div>
+        </div>
         )}
       </div>
 

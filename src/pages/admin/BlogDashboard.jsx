@@ -753,7 +753,6 @@ export default function BlogDashboard() {
           </div>
         </div>
       </div>
-        )}
       </div>
 
       {/* Delete Confirmation Modal */}
