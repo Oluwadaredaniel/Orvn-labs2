@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink, Mail, Send } from 'lucide-react';
+import { Plus, LogOut, Edit2, Trash2, Eye, EyeOff, AlertTriangle, BarChart2, BookOpen, FileText, CheckCircle, Copy, Settings, Tag, Layers, Users, MessageSquare, ExternalLink, Mail, Send, Search } from 'lucide-react';
 
 import { supabase } from '../../lib/supabase';
 import { signOut, getCurrentUser } from '../../lib/admin-auth';
