@@ -354,7 +354,7 @@ export default function BlogEditor() {
           </div>
 
           {/* Excerpt & Category Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(200px, 1fr)', gap: 20 }}>
             <div style={{ background: '#fff', border: '1px solid #E5E8F0', borderRadius: 12, padding: 24 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8 }}>
                 Excerpt *

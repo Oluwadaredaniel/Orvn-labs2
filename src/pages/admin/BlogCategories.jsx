@@ -102,7 +102,7 @@ export default function BlogCategories() {
       </div>
 
       <div className="container-page" style={{ maxWidth: 800, paddingBlock: 40 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 32, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.5fr)', gap: 32, alignItems: 'start' }}>
           {/* Form */}
           <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1px solid #E5E8F0' }}>
             <h3 style={{ margin: '0 0 20px', fontSize: 18, fontWeight: 800 }}>Create Category</h3>

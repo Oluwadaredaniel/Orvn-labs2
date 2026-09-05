@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send, Heart, Twitter, Linkedin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Copy, Check, MessageSquare, Send, Heart, Twitter, Linkedin, Github } from 'lucide-react';
 
 import PageWrapper from '../components/PageWrapper';
 import Section from '../components/ui/Section';
@@ -162,6 +162,14 @@ export default function BlogPost() {
 
       setPost(post);
       setLikesCount(post.likes_count || 0);
+
+      // Fetch author details
+      const { data: authorData } = await supabase
+        .from('blog_authors')
+        .select('*')
+        .eq('name', post.author)
+        .single();
+      if (authorData) setAuthor(authorData);
 
       // Fetch related posts
       const relatedPosts = await getRelatedPosts(slug, post.category, 3);
@@ -498,7 +506,7 @@ export default function BlogPost() {
                 <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6, margin: '0 0 16px' }}>{author.bio}</p>
                 <div style={{ display: 'flex', gap: 16 }}>
                   {author.twitter_url && <a href={author.twitter_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Twitter size={18} /></a>}
-                  {author.github_url && <a href={author.github_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Linkedin size={18} /></a>}
+                  {author.github_url && <a href={author.github_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Github size={18} /></a>}
                   {author.website_url && <a href={author.website_url} target="_blank" rel="noreferrer" style={{ color: '#94A3B8' }}><Share2 size={18} /></a>}
                 </div>
               </div>
@@ -596,7 +604,7 @@ export default function BlogPost() {
             <form onSubmit={handlePostComment} style={{ background: '#F8FAFC', borderRadius: 16, padding: 24, border: '1px solid #E2E8F0', marginBottom: 32 }}>
               <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700 }}>Leave a comment</h4>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 16 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>NAME</label>
                   <input

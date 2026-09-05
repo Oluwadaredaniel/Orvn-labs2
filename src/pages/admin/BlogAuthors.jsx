@@ -142,8 +142,8 @@ export default function BlogAuthors() {
                       <div style={{ fontSize: 13, color: '#5B3FD4', fontWeight: 600, marginBottom: 8 }}>{author.role}</div>
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => handleOpenModal(author)} style={{ p: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#475569' }}><Edit2 size={16} /></button>
-                      <button onClick={() => handleDelete(author.id)} style={{ p: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444' }}><Trash2 size={16} /></button>
+                      <button onClick={() => handleOpenModal(author)} style={{ padding: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#475569' }}><Edit2 size={16} /></button>
+                      <button onClick={() => handleDelete(author.id)} style={{ padding: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444' }}><Trash2 size={16} /></button>
                     </div>
                   </div>
                   <p style={{ fontSize: 13, color: '#64748B', lineHeight: 1.5, margin: '0 0 16px' }}>{author.bio}</p>
@@ -161,7 +161,7 @@ export default function BlogAuthors() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingAuthor ? 'Edit Author' : 'Add New Author'}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>Full Name</label>
               <input
@@ -200,7 +200,7 @@ export default function BlogAuthors() {
               style={{ width: '100%', padding: 12, border: '1px solid #E5E8F0', borderRadius: 8, fontFamily: 'inherit' }}
             />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
             <div>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 6 }}>TWITTER</label>
               <input type="text" value={formData.twitter_url} onChange={(e) => setFormData({ ...formData, twitter_url: e.target.value })} style={{ width: '100%', padding: 10, border: '1px solid #E5E8F0', borderRadius: 8, fontSize: 12 }} />

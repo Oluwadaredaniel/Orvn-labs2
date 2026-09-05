@@ -180,16 +180,16 @@ export default function BlogComments() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {c.status !== 'approved' && (
-                    <button onClick={() => handleModerate(c.id, 'approved')} style={{ p: 8, background: '#ECFDF5', border: 'none', borderRadius: 8, color: '#059669', cursor: 'pointer' }} title="Approve">
+                    <button onClick={() => handleModerate(c.id, 'approved')} style={{ padding: 8, background: '#ECFDF5', border: 'none', borderRadius: 8, color: '#059669', cursor: 'pointer' }} title="Approve">
                       <Check size={18} />
                     </button>
                   )}
                   {c.status !== 'spam' && (
-                    <button onClick={() => handleModerate(c.id, 'spam')} style={{ p: 8, background: '#FFFBEB', border: 'none', borderRadius: 8, color: '#D97706', cursor: 'pointer' }} title="Mark as Spam">
+                    <button onClick={() => handleModerate(c.id, 'spam')} style={{ padding: 8, background: '#FFFBEB', border: 'none', borderRadius: 8, color: '#D97706', cursor: 'pointer' }} title="Mark as Spam">
                       <ShieldAlert size={18} />
                     </button>
                   )}
-                  <button onClick={() => handleDelete(c.id)} style={{ p: 8, background: '#FEF2F2', border: 'none', borderRadius: 8, color: '#DC2626', cursor: 'pointer' }} title="Delete">
+                  <button onClick={() => handleDelete(c.id)} style={{ padding: 8, background: '#FEF2F2', border: 'none', borderRadius: 8, color: '#DC2626', cursor: 'pointer' }} title="Delete">
                     <Trash2 size={18} />
                   </button>
                 </div>

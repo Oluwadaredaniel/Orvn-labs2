@@ -66,7 +66,7 @@ export default function BlogDashboard() {
       }
     } catch (err) {
       console.error('Failed to load posts:', err);
-      alert('Failed to load posts');
+      showToast('Failed to load posts', 'error');
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ export default function BlogDashboard() {
       navigate('/admin/login');
     } catch (err) {
       console.error('Sign out failed:', err);
-      alert('Failed to sign out');
+      showToast('Failed to sign out', 'error');
       setIsSigningOut(false);
     }
   };
@@ -269,7 +269,7 @@ export default function BlogDashboard() {
               Logged in as {user?.email}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <button
               onClick={() => navigate('/admin/blog/categories')}
               style={{
@@ -453,7 +453,7 @@ export default function BlogDashboard() {
         )}
 
         {/* Bottom Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 32, marginBottom: 40 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(250px, 1fr)', gap: 32, marginBottom: 40 }}>
            {/* Post List */}
            <div>
              <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
@@ -473,7 +473,7 @@ export default function BlogDashboard() {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto',
+                gridTemplateColumns: 'minmax(0, 3fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) auto',
                 gap: 16,
                 padding: '16px 20px',
                 background: '#F7F8FB',
@@ -503,7 +503,7 @@ export default function BlogDashboard() {
                   key={post.id}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '3fr 1fr 1fr 1fr 1fr auto',
+                gridTemplateColumns: 'minmax(0, 3fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) auto',
                     gap: 16,
                     padding: '16px 20px',
                     borderBottom: '1px solid #F1F5F9',

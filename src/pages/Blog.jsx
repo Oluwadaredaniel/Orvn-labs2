@@ -71,7 +71,14 @@ export default function Blog() {
   const [error, setError] = useState('');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
   const LIMIT = 9;
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth > 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     loadCategories();
@@ -122,7 +129,7 @@ export default function Blog() {
 
       let query = supabase
         .from('blog_posts')
-        .select('id, slug, title, excerpt, category, author, featured_image_url, featured_image_alt, read_minutes, published_at')
+        .select('id, slug, title, excerpt, category, author, featured_image_url, featured_image_alt, read_minutes, published_at, tags')
         .eq('is_published', true)
         .lte('published_at', new Date().toISOString())
         .order('published_at', { ascending: false })
@@ -392,7 +399,7 @@ export default function Blog() {
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--risk)' }}>
               <p>{error}</p>
               <button
-                onClick={loadPostsAndCategories}
+                onClick={() => loadPosts(true)}
                 style={{
                   marginTop: 16,
                   padding: '10px 20px',
@@ -454,7 +461,7 @@ export default function Blog() {
                       flexDirection: 'column',
                       overflow: 'hidden',
                       gridColumn: isFeatured ? '1 / -1' : 'span 1',
-                      flexDirection: isFeatured ? (window.innerWidth > 768 ? 'row' : 'column') : 'column',
+                      flexDirection: isFeatured ? (isDesktop ? 'row' : 'column') : 'column',
                     }}
                   >
                     {post.featured_image_url && (
@@ -463,9 +470,9 @@ export default function Blog() {
                         style={{
                           display: 'block',
                           overflow: 'hidden',
-                          height: isFeatured ? (window.innerWidth > 768 ? 'auto' : 300) : 200,
-                          width: isFeatured && window.innerWidth > 768 ? '50%' : '100%',
-                          minHeight: isFeatured && window.innerWidth > 768 ? 400 : 'auto'
+                          height: isFeatured ? (isDesktop ? 'auto' : 300) : 200,
+                          width: isFeatured && isDesktop ? '50%' : '100%',
+                          minHeight: isFeatured && isDesktop ? 400 : 'auto'
                         }}
                       >
                         <img
@@ -489,7 +496,7 @@ export default function Blog() {
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: isFeatured ? 'center' : 'flex-start',
-                      width: isFeatured && window.innerWidth > 768 ? '50%' : '100%',
+                      width: isFeatured && isDesktop ? '50%' : '100%',
                     }}>
                       <span
                         style={{
